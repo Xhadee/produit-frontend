@@ -1,3 +1,4 @@
+/* --- BASE NAVBAR --- */
 .navbar {
   height: 80px;
   background-color: var(--bg-card);
@@ -8,21 +9,94 @@
 }
 
 /* --- COULEURS ADAPTATIVES --- */
-.nav-title, .user-name, .user-name-alt {
+.nav-title, .user-name, .user-name-alt, .notif-title {
   color: var(--text-main) !important;
 }
 
-.nav-welcome, .user-role, .user-email-alt, .nav-chevron, .btn-toggle {
+.nav-welcome, .user-role, .user-email-alt, .nav-chevron, .btn-toggle, .notif-msg, .notif-date {
   color: var(--text-muted) !important;
 }
 
-/* --- LE CERCLE XH (FIX DÉFINITIF) --- */
+/* --- NOTIFICATIONS (LA CLOCHE) --- */
+.notif-btn {
+  background: var(--bg-app);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.notif-btn:hover {
+  background-color: var(--border-color);
+  transform: translateY(-2px);
+}
+
+.notif-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444; /* Rouge vif moderne */
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 6px;
+  border: 2px solid var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- DROPDOWNS (PROFIL & NOTIFS) --- */
+.nav-dropdown {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: slideDown 0.2s ease-out;
+}
+
+.notif-dropdown {
+  width: 320px;
+}
+
+.notif-list-container {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+/* Style de la barre de défilement pour les notifs */
+.notif-list-container::-webkit-scrollbar { width: 5px; }
+.notif-list-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+.notif-item {
+  transition: background 0.2s;
+  cursor: default;
+}
+
+.notif-item:hover {
+  background-color: var(--bg-app);
+}
+
+/* --- CERCLE AVATAR (LE "XH") --- */
 .avatar-circle {
   width: 42px;
   height: 42px;
   border-radius: 12px;
   background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-  color: #ffffff !important; /* Force le blanc car le fond bleu est fixe */
+  color: #ffffff !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -30,57 +104,95 @@
   box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
 }
 
-/* --- RECHERCHE --- */
-.search-field {
-  background-color: var(--bg-app);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  width: 350px;
-}
-
-.search-field i {
-  color: var(--text-muted);
-}
-
-.search-input {
+/* --- BOUTONS & ITEMS --- */
+.btn-clear {
   background: transparent;
   border: none;
-  outline: none;
-  width: 100%;
-  padding-left: 10px;
-  color: var(--text-main) !important; /* Le texte écrit sera visible en blanc sur noir */
+  color: #3b82f6;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
-/* --- DROPDOWN --- */
-.nav-dropdown {
-  position: absolute;
-  top: 110%;
-  right: 0;
-  width: 220px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  z-index: 1000;
+.btn-clear:hover { text-decoration: underline; }
+
+.btn-mark-read {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  line-height: 1;
 }
+
+.btn-mark-read:hover { color: #ef4444; }
 
 .drop-item {
   width: 100%;
-  padding: 10px;
+  padding: 10px 15px;
   background: transparent;
   border: none;
   text-align: left;
   color: var(--text-main);
-  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s;
 }
 
 .drop-item:hover {
   background-color: var(--bg-app);
 }
 
-.btn-toggle { background: transparent; border: none; }
-.profile-btn { background: transparent; border: none; }
+/* --- ANIMATIONS & ÉTATS --- */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .nav-chevron { transition: transform 0.3s; }
 .nav-chevron.rotated { transform: rotate(180deg); }
+
+.btn-toggle, .profile-btn { background: transparent; border: none; }
+
+.notif-icon.alerte { color: #f59e0b; }
+.notif-icon.info { color: #3b82f6; }
+.notif-msg { font-size: 0.85rem; line-height: 1.4; }
+
+/* Animation d'apparition en fondu */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Animation de glissement pour les champs d'inscription */
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Animation de vibration en cas d'erreur */
+.animate-shake {
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; max-height: 0; transform: translateY(-10px); }
+  to { opacity: 1; max-height: 200px; transform: translateY(0); }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* Style des champs input group */
+.input-group-text {
+  color: #6c757d;
+  border-radius: 8px 0 0 8px;
+}
+.form-control {
+  border-radius: 0 8px 8px 0;
+}

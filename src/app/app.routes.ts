@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { Routes as RouterRoutes } from '@angular/router'; // Pour lever toute ambiguïté
 import { ProduitListComponent } from './components/produit-list/produit-list.component';
 import { ProduitDetailsComponent } from "./components/produit-details/produit-details.component";
 import { CategorieListComponent } from "./components/categorie-list/categorie-list.component";
@@ -7,30 +6,41 @@ import { CategorieDetailsComponent } from "./components/categorie-details/catego
 import { FournisseurListComponent } from "./components/fournisseur-list/fournisseur-list.component";
 import { FournisseurDetailsComponent } from "./components/fournisseur-details/fournisseur-details.component";
 import { IaAnalyticsComponent } from "./components/ia-analytics/ia-analytics.component";
-import { SettingsComponent } from "./components/settings/settings.component"; // NOUVEL IMPORT
+import { SettingsComponent } from "./components/settings/settings.component";
+import { LoginComponent } from "./components/login/login.component"; // IMPORT DU LOGIN
+import { authGuard } from "./guards/auth.guard"; // IMPORT DU GUARD
 
-export const routes: RouterRoutes = [
-  // 1. Redirection de la racine vers le tableau de bord (produits)
-  { path: '', redirectTo: '/produits', pathMatch: 'full' },
+export const routes: Routes = [
+  // --- ROUTES PUBLIQUES ---
+  { path: 'login', component: LoginComponent },
 
-  // 2. Gestion des Produits
-  { path: 'produits', component: ProduitListComponent },
-  { path: 'produit/:id', component: ProduitDetailsComponent },
+  // --- ROUTES PROTÉGÉES (Nécessitent une connexion) ---
+  {
+    path: '',
+    canActivate: [authGuard], // Protection globale pour tous les enfants
+    children: [
+      { path: '', redirectTo: 'produits', pathMatch: 'full' },
 
-  // 3. Gestion des Catégories
-  { path: 'categories', component: CategorieListComponent },
-  { path: 'categorie/:id', component: CategorieDetailsComponent },
+      // Gestion des Produits
+      { path: 'produits', component: ProduitListComponent },
+      { path: 'produit/:id', component: ProduitDetailsComponent },
 
-  // 4. Gestion des Fournisseurs
-  { path: 'fournisseurs', component: FournisseurListComponent },
-  { path: 'fournisseur/:id', component: FournisseurDetailsComponent },
+      // Gestion des Catégories
+      { path: 'categories', component: CategorieListComponent },
+      { path: 'categorie/:id', component: CategorieDetailsComponent },
 
-  // 5. Analyse IA (Module prédictif)
-  { path: 'analyse', component: IaAnalyticsComponent },
+      // Gestion des Fournisseurs
+      { path: 'fournisseurs', component: FournisseurListComponent },
+      { path: 'fournisseur/:id', component: FournisseurDetailsComponent },
 
-  // 6. Système & Configuration (NOUVELLE ROUTE)
-  { path: 'parametres', component: SettingsComponent },
+      // Analyse IA
+      { path: 'analyse', component: IaAnalyticsComponent },
 
-  // 7. Gestion des erreurs (Wildcard) - Toujours en dernier
-  { path: '**', redirectTo: '/produits' }
-]
+      // Système & Configuration
+      { path: 'parametres', component: SettingsComponent },
+    ]
+  },
+
+  // --- GESTION DES ERREURS ---
+  { path: '**', redirectTo: 'login' }
+];

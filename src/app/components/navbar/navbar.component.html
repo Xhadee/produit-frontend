@@ -7,19 +7,59 @@
       </button>
       <div class="d-none d-md-block ms-2">
         <h5 class="mb-0 fw-bold nav-title">Tableau de Bord</h5>
-        <span class="nav-welcome">Bienvenue, {{ currentUser.nom }}</span>
+        <span class="nav-welcome" *ngIf="currentUser">Bienvenue, {{ currentUser.nom }}</span>
       </div>
     </div>
 
-    <div class="d-flex align-items-center gap-3">
-      <div class="profile-group position-relative">
+    <div class="d-flex align-items-center gap-4">
+
+      <div class="notification-group position-relative">
+        <button class="notif-btn ripple" (click)="toggleNotifMenu()">
+          <i class="bi bi-bell fs-5"></i>
+          <span *ngIf="notifications.length > 0" class="notif-badge">
+            {{ notifications.length > 9 ? '9+' : notifications.length }}
+          </span>
+        </button>
+
+        <div class="nav-dropdown notif-dropdown shadow-lg" *ngIf="notifMenuOpen">
+          <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 fw-bold">Notifications</h6>
+            <button *ngIf="notifications.length > 0" (click)="toutMarquerLu()" class="btn-clear">Tout effacer</button>
+          </div>
+
+          <div class="notif-list-container">
+            <div *ngIf="notifications.length === 0" class="p-4 text-center text-muted">
+              <i class="bi bi-check2-circle fs-2 d-block mb-2"></i>
+              <p class="small mb-0">Aucune alerte de stock</p>
+            </div>
+
+            <div *ngFor="let n of notifications" class="notif-item p-3 border-bottom d-flex gap-3">
+              <div class="notif-icon" [ngClass]="n.type.toLowerCase()">
+                <i class="bi" [ngClass]="n.type === 'ALERTE' ? 'bi-exclamation-triangle' : 'bi-info-circle'"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between">
+                  <span class="notif-title">{{ n.titre }}</span>
+                  <button (click)="marquerLue(n.id, $event)" class="btn-mark-read">
+                    <i class="bi bi-x"></i>
+                  </button>
+                </div>
+                <p class="notif-msg mb-0">{{ n.message }}</p>
+                <small class="notif-date text-muted">{{ n.dateCreation | date:'HH:mm' }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-group position-relative" *ngIf="currentUser">
         <button class="profile-btn d-flex align-items-center gap-3 ripple" (click)="toggleProfileMenu()">
           <div class="profile-text d-none d-sm-block text-end">
             <div class="user-name">{{ currentUser.nom }}</div>
-            <div class="user-role">{{ currentUser.role }}</div>
+            <div class="user-role badge rounded-pill bg-light text-dark">{{ currentUser.role }}</div>
           </div>
           <div class="avatar-circle">
-            {{ currentUser.initiales }}
+            {{ initiales }}
           </div>
           <i class="bi bi-chevron-down nav-chevron" [class.rotated]="profileMenuOpen"></i>
         </button>
@@ -40,6 +80,7 @@
           </div>
         </div>
       </div>
+
     </div>
 
   </div>

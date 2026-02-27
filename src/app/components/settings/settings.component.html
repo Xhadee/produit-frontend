@@ -1,82 +1,91 @@
-<div class="container-fluid py-4">
-  <div class="header-glass p-4 mb-5 rounded-5 shadow-soft">
-    <h2 class="title-theme fw-black mb-1">Configuration</h2>
-    <p class="text-secondary-adaptive mb-0">Gérez votre profil et les préférences de la plateforme.</p>
+<div class="settings-container animate-fade-in">
+  <div class="settings-header mb-4">
+    <h2 class="fw-bold text-main">Paramètres de la Plateforme</h2>
+    <p class="text-muted">Gérez vos informations personnelles et vos préférences système.</p>
+  </div>
+
+  <div *ngIf="messageFeedback.text" [class]="'alert alert-' + messageFeedback.type + ' shadow-sm border-0'" role="alert">
+    <i class="bi" [class.bi-check-circle-fill]="messageFeedback.type === 'success'" [class.bi-exclamation-triangle-fill]="messageFeedback.type === 'danger'"></i>
+    {{ messageFeedback.text }}
   </div>
 
   <div class="row g-4">
-    <div class="col-lg-3">
-      <div class="card border-0 shadow-soft p-3 rounded-4 bg-white">
-        <div class="nav flex-column nav-pills gap-2">
-          <button class="nav-link rounded-3 p-3 text-start d-flex align-items-center"
-                  [class.active]="activeTab === 'profil'" (click)="setTab('profil')">
-            <i class="bi bi-person-circle me-3"></i> Profil
-          </button>
-          <button class="nav-link rounded-3 p-3 text-start d-flex align-items-center"
-                  [class.active]="activeTab === 'systeme'" (click)="setTab('systeme')">
-            <i class="bi bi-translate me-3"></i> Langue & Région
-          </button>
-          <button class="nav-link rounded-3 p-3 text-start d-flex align-items-center"
-                  [class.active]="activeTab === 'notifs'" (click)="setTab('notifs')">
-            <i class="bi bi-bell-fill me-3"></i> Notifications
-          </button>
-        </div>
+    <div class="col-md-3">
+      <div class="settings-nav shadow-sm">
+        <button class="nav-tab" [class.active]="activeTab === 'profil'" (click)="setTab('profil')">
+          <i class="bi bi-person-circle"></i> Profil Public
+        </button>
+        <button class="nav-tab" [class.active]="activeTab === 'securite'" (click)="setTab('securite')">
+          <i class="bi bi-shield-lock"></i> Sécurité
+        </button>
+        <button class="nav-tab" [class.active]="activeTab === 'systeme'" (click)="setTab('systeme')">
+          <i class="bi bi-gear"></i> Système
+        </button>
       </div>
     </div>
 
-    <div class="col-lg-9">
-      <div class="card border-0 shadow-soft p-5 rounded-4 bg-white">
-        <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()">
+    <div class="col-md-9">
+      <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()" class="settings-card shadow-sm">
 
-          <div *ngIf="activeTab === 'profil'" class="fade-in">
-            <h4 class="fw-bold mb-4">Informations personnelles</h4>
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="label-pro">NOM D'UTILISATEUR</label>
-                <input type="text" class="form-control custom-input" formControlName="nom">
-              </div>
-              <div class="col-md-6">
-                <label class="label-pro">EMAIL</label>
-                <input type="email" class="form-control custom-input" formControlName="email">
-              </div>
+        <div *ngIf="activeTab === 'profil'" class="tab-content">
+          <h4 class="mb-4">Informations de Profil</h4>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Identifiant (Username)</label>
+              <input type="text" formControlName="username" class="form-control bg-light" readonly>
+              <small class="text-muted">L'identifiant ne peut pas être modifié.</small>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nom Complet</label>
+              <input type="text" formControlName="nom" class="form-control" placeholder="Ex: Khadija">
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label">Adresse Email</label>
+              <input type="email" formControlName="email" class="form-control" placeholder="nom@exemple.sn">
             </div>
           </div>
+        </div>
 
-          <div *ngIf="activeTab === 'systeme'" class="fade-in">
-            <h4 class="fw-bold mb-4">Préférences système</h4>
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="label-pro">LANGUE</label>
-                <select class="form-select custom-input" formControlName="langue">
-                  <option *ngFor="let l of languages" [value]="l.code">{{l.flag}} {{l.label}}</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label class="label-pro">DEVISE</label>
-                <input type="text" class="form-control custom-input" formControlName="devise" readonly>
-              </div>
+        <div *ngIf="activeTab === 'securite'" class="tab-content">
+          <h4 class="mb-4">Mot de Passe</h4>
+          <div class="col-md-8 mb-3">
+            <label class="form-label">Nouveau Mot de Passe</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-key"></i></span>
+              <input type="password" formControlName="password" class="form-control" placeholder="Laissez vide pour ne pas changer">
+            </div>
+            <small class="text-muted">Utilisez au moins 8 caractères avec des chiffres et symboles.</small>
+          </div>
+        </div>
+
+        <div *ngIf="activeTab === 'systeme'" class="tab-content">
+          <h4 class="mb-4">Préférences du Système</h4>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Langue de l'interface</label>
+              <select formControlName="langue" class="form-select">
+                <option *ngFor="let lang of languages" [value]="lang.code">
+                  {{ lang.flag }} {{ lang.label }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Seuil d'alerte stock (Global)</label>
+              <input type="number" formControlName="seuilAlerte" class="form-control">
             </div>
           </div>
+        </div>
 
-          <div *ngIf="activeTab === 'notifs'" class="fade-in">
-            <h4 class="fw-bold mb-4">Paramètres d'alerte</h4>
-            <div class="form-check form-switch mb-3">
-              <input class="form-check-input" type="checkbox" formControlName="notifEmail">
-              <label class="form-check-label ms-2">Recevoir les rapports par Email</label>
-            </div>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" formControlName="notifStock">
-              <label class="form-check-label ms-2">Alertes de stock critique</label>
-            </div>
-          </div>
-
-          <div class="mt-5 pt-4 border-top text-end">
-            <button type="submit" class="btn btn-primary-gradient px-5 py-2 rounded-pill fw-bold border-0 shadow-primary">
-              Enregistrer
-            </button>
-          </div>
-        </form>
-      </div>
+        <div class="card-footer-actions mt-4 pt-3 border-top d-flex justify-content-end gap-3">
+          <button type="button" class="btn btn-outline-secondary" (click)="chargerDonneesUtilisateur()">
+            Annuler les changements
+          </button>
+          <button type="submit" class="btn btn-primary px-4" [disabled]="settingsForm.invalid || isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            Enregistrer les modifications
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
