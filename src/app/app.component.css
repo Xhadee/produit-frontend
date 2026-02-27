@@ -1,0 +1,38 @@
+:host {
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 88px;
+  --transition-speed: 0.4s;
+  --transition-curve: cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.app-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--bg-app); /* Utilise la variable globale de styles.css */
+}
+
+/* On définit juste comment le main réagit à la sidebar */
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  transition: all var(--transition-speed) var(--transition-curve);
+}
+
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.animate-page {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

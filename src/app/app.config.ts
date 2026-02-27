@@ -1,12 +1,14 @@
-
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http'; // 1. Importation
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
+import { authInterceptor } from './interceptors/auth.interceptor'; // Import ici
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient() // 2. Activation du service HTTP
+    provideHttpClient(
+      withInterceptors([authInterceptor]) // Activation ici
+    )
   ]
 };

@@ -1,0 +1,25 @@
+<div class="splash-overlay" *ngIf="isVisible" [class.exit-animation]="isExiting">
+  <div class="splash-content">
+
+    <div class="logo-container">
+      <svg class="main-logo" viewBox="0 0 100 100">
+        <circle class="logo-circle" cx="50" cy="50" r="45" />
+        <path class="logo-path" d="M30 50 L45 65 L70 35" />
+      </svg>
+    </div>
+
+    <div class="text-container">
+      <h1 class="brand-name">IPSL<span class="dot">.</span>STOCK</h1>
+      <p class="brand-sub">L'intelligence artificielle au service de vos flux</p>
+    </div>
+
+    <div class="loader-wrapper">
+      <div class="loader-track">
+        <div class="loader-fill"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="dynamic-bg"></div>
+</div>

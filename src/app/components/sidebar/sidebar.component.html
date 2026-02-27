@@ -1,0 +1,66 @@
+<aside class="sidebar shadow-2xl" [class.collapsed]="isCollapsed">
+  <div class="sidebar-header px-4 py-5">
+    <div class="brand d-flex align-items-center" [class.justify-content-center]="isCollapsed">
+      <div class="logo-wrapper">
+        <div class="logo-icon bg-gradient-primary rounded-xl shadow-lg">
+          <i class="bi bi-layers-half text-white fs-4"></i>
+        </div>
+        <div class="logo-glow"></div>
+      </div>
+
+      <span class="brand-name fw-bold fs-4 ms-3" *ngIf="!isCollapsed">
+        IPSL<span class="text-primary">Stock</span>
+      </span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav px-2 mt-3">
+    <div class="nav-label ps-3" *ngIf="!isCollapsed">Principal</div>
+
+    <a class="nav-link-item ripple" routerLink="/produits" routerLinkActive="active" title="Stocks">
+      <div class="icon-box"><i class="bi bi-grid-1x2"></i></div>
+      <span class="link-text" *ngIf="!isCollapsed">Stocks</span>
+      <div class="active-indicator"></div>
+    </a>
+
+    <a class="nav-link-item ripple" routerLink="/categories" routerLinkActive="active" title="Catégories">
+      <div class="icon-box"><i class="bi bi-collection"></i></div>
+      <span class="link-text" *ngIf="!isCollapsed">Catégories</span>
+      <div class="active-indicator"></div>
+    </a>
+
+    <a class="nav-link-item ripple" routerLink="/fournisseurs" routerLinkActive="active" title="Fournisseurs">
+      <div class="icon-box"><i class="bi bi-person-badge"></i></div>
+      <span class="link-text" *ngIf="!isCollapsed">Fournisseurs</span>
+      <div class="active-indicator"></div>
+    </a>
+
+    <div class="nav-label ps-3 mt-4" *ngIf="!isCollapsed">Système</div>
+
+    <div class="nav-link-item theme-link ripple" (click)="toggleTheme()"
+         [title]="isDarkMode() ? 'Passer au mode clair' : 'Passer au mode nuit'"
+         style="cursor: pointer;">
+      <div class="icon-box">
+        <i class="bi" [ngClass]="isDarkMode() ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill text-info'"></i>
+      </div>
+      <span class="link-text" *ngIf="!isCollapsed">
+        {{ isDarkMode() ? 'Mode Lumière' : 'Mode Nuit' }}
+      </span>
+    </div>
+
+    <a class="nav-link-item ripple" routerLink="/parametres" routerLinkActive="active" title="Paramètres">
+      <div class="icon-box"><i class="bi bi-gear-fill"></i></div>
+      <span class="link-text" *ngIf="!isCollapsed">Paramètres</span>
+      <div class="active-indicator"></div>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer mt-auto" *ngIf="!isCollapsed">
+    <div class="status-card mx-3 mb-4">
+      <div class="d-flex align-items-center">
+        <div class="status-dot"></div>
+        <span class="status-text">Système IA Actif</span>
+      </div>
+    </div>
+  </div>
+</aside>

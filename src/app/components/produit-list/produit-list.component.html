@@ -1,0 +1,180 @@
+<div class="container-fluid py-4" *ngIf="!chargement; else loader">
+
+  <div class="header-glass p-4 mb-5 rounded-5 shadow-soft d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
+    <div class="text-center text-md-start">
+      <h2 class="title-theme fw-black mb-1">Produits</h2>
+      <p class="text-secondary-adaptive mb-0">Organisez vos produits par familles de catégories</p>
+    </div>
+
+    <div class="d-flex flex-grow-1 justify-content-center px-md-5">
+      <div class="search-box w-100 max-width-500">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" class="form-control search-input shadow-none"
+               [(ngModel)]="searchTerm" (input)="grouperEtFiltrer()"
+               placeholder="Rechercher un produit...">
+      </div>
+    </div>
+
+    <button class="btn btn-primary-gradient px-4 py-3 rounded-4 shadow-primary hover-lift fw-bold border-0"
+            data-bs-toggle="modal" data-bs-target="#produitModal"
+            (click)="preparerAjout()">
+      <i class="bi bi-plus-circle-fill me-2"></i>Nouveau Produit
+    </button>
+  </div>
+
+  <div class="d-flex overflow-auto pb-3 mb-4 gap-3 no-scrollbar horizontal-scroll">
+    <div *ngFor="let catNom of getNomsCategories()"
+         (click)="selectionnerCategorie(catNom)"
+         [class.active-cat]="categorieSelectionnee === catNom"
+         class="category-pill shadow-sm transition-all cursor-pointer">
+      <div class="d-flex align-items-center gap-3">
+        <div class="cat-icon-box">
+          <i class="bi bi-grid-1x2"></i>
+        </div>
+        <div class="text-start">
+          <div class="fw-bold small text-uppercase text-truncate" style="max-width: 100px;">{{ catNom }}</div>
+          <div class="cat-count">{{ produitsParCategorie[catNom]?.length || 0 }} articles</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-5" *ngIf="categorieSelectionnee">
+    <div class="col-xl-3 col-lg-4 col-md-6" *ngFor="let p of produitsPagines">
+      <div class="card h-100 product-card border-0 shadow-soft overflow-hidden">
+        <div class="position-relative product-img-container" (click)="voirDetails(p.id!)">
+          <img [src]="p.imageUrl || 'https://placehold.co/400x400/2563eb/ffffff?text=' + p.designation"
+               class="w-100 h-100 object-fit-cover transition-all" alt="produit">
+          <div class="position-absolute top-0 end-0 p-2">
+            <span class="badge-status shadow-sm"
+                  [ngClass]="(p.quantiteStock || 0) <= (p.seuilAlerte || 0) ? 'status-alert' : 'status-ok'">
+              {{ (p.quantiteStock || 0) <= (p.seuilAlerte || 0) ? 'Alerte' : 'En stock' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div class="text-truncate">
+              <h6 class="fw-bold mb-0 title-theme text-truncate">{{ p.designation }}</h6>
+              <small class="text-secondary-adaptive">{{ p.fournisseur?.nom || 'Sans fournisseur' }}</small>
+            </div>
+            <div class="price-tag text-primary fw-black text-nowrap">
+              {{ p.prixUnitaire | number }} <small style="font-size: 0.6em;">FCFA</small>
+            </div>
+          </div>
+
+          <div class="mb-3 mt-3">
+            <div class="d-flex justify-content-between small mb-1">
+              <span class="text-muted">Stock: <b class="title-theme">{{ p.quantiteStock }}</b></span>
+              <span class="text-muted">Seuil: {{ p.seuilAlerte }}</span>
+            </div>
+            <div class="progress-modern">
+              <div class="progress-bar-modern"
+                   [style.width.%]="(p.quantiteStock! / (p.seuilAlerte! * 4)) * 100 > 100 ? 100 : (p.quantiteStock! / (p.seuilAlerte! * 4)) * 100"
+                   [ngClass]="(p.quantiteStock || 0) <= (p.seuilAlerte || 0) ? 'bg-danger' : 'bg-primary'"></div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 action-row mt-4">
+            <button class="btn-action-circle" (click)="voirDetails(p.id!)" title="Voir">
+              <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn-action-circle" data-bs-toggle="modal" data-bs-target="#produitModal" (click)="preparerEdition(p)" title="Modifier">
+              <i class="bi bi-pencil-square text-primary"></i>
+            </button>
+            <button class="btn-action-circle" (click)="supprimerProduit(p.id!)" title="Supprimer">
+              <i class="bi bi-trash3 text-danger"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-center mt-4 mb-5" *ngIf="categorieSelectionnee && totalPages > 1">
+    <div class="pagination-neo shadow-soft">
+      <button class="pag-btn" [disabled]="p_pageActuelle === 1" (click)="p_pageActuelle = p_pageActuelle - 1">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <span class="pag-info">Page {{ p_pageActuelle }} / {{ totalPages }}</span>
+      <button class="pag-btn" [disabled]="p_pageActuelle === totalPages" (click)="p_pageActuelle = p_pageActuelle + 1">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="produitModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content modal-neo border-0 shadow-lg">
+      <div class="modal-header border-0 p-4 pb-0">
+        <h5 class="modal-title fw-black title-theme">
+          {{ isEditMode ? 'Modifier le Produit' : 'Nouveau Produit' }}
+        </h5>
+        <button type="button" class="btn-close shadow-none" id="closeModalBtn" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form [formGroup]="produitForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body p-4">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label text-muted small fw-bold">IMAGE DU PRODUIT (URL)</label>
+              <input type="text" formControlName="imageUrl" class="form-control custom-input" placeholder="https://votre-image.jpg">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-muted small fw-bold">DÉSIGNATION</label>
+              <input type="text" formControlName="designation" class="form-control custom-input" placeholder="Nom du produit">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-bold">PRIX UNITAIRE</label>
+              <input type="number" formControlName="prixUnitaire" class="form-control custom-input">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-bold">STOCK INITIAL</label>
+              <input type="number" formControlName="quantiteStock" class="form-control custom-input">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-bold">SEUIL D'ALERTE</label>
+              <input type="number" formControlName="seuilAlerte" class="form-control custom-input">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-bold">CATÉGORIE</label>
+              <select formControlName="categorie" class="form-select custom-input" [compareWith]="compareObjects">
+                <option [ngValue]="null">Choisir une catégorie...</option>
+                <option *ngFor="let c of categories" [ngValue]="c">{{ c.nom }}</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-muted small fw-bold">FOURNISSEUR</label>
+              <select formControlName="fournisseur" class="form-select custom-input" [compareWith]="compareObjects">
+                <option [ngValue]="null">Choisir un fournisseur...</option>
+                <option *ngFor="let f of fournisseurs" [ngValue]="f">{{ f.nom }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0 p-4 pt-0">
+          <button type="button" class="btn btn-light rounded-4 px-4 fw-bold" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary-gradient rounded-4 px-5 fw-bold" [disabled]="produitForm.invalid">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ isEditMode ? 'Enregistrer les modifications' : 'Créer le produit' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<ng-template #loader>
+  <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 80vh;">
+    <div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+    <p class="text-muted fw-bold mt-4 animate-pulse">Synchronisation de l'inventaire...</p>
+  </div>
+</ng-template>

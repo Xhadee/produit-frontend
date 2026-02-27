@@ -1,0 +1,217 @@
+/* --- VARIABLES & BASE ADAPTIVE --- */
+:host {
+  --primary: #0d6efd;
+  --primary-gradient: linear-gradient(135deg, #0d6efd, #0043a8);
+  --text-main: var(--bs-emphasis-color);
+  --text-muted: var(--bs-secondary-color);
+  --bg-card: var(--bs-body-bg);
+  --bg-app: var(--bs-tertiary-bg);
+  --border-color: var(--bs-border-color-translucent);
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* --- TITRES --- */
+.title-theme, .text-adaptive {
+  color: var(--text-main) !important;
+}
+
+.text-secondary-adaptive {
+  color: var(--text-muted) !important;
+}
+
+/* --- HEADER GLASSMORPHISM --- */
+.header-glass {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+}
+
+/* --- RECHERCHE MODERNE --- */
+.search-box { position: relative; }
+
+.search-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  z-index: 5;
+}
+
+.search-input {
+  border-radius: 50px;
+  padding: 14px 20px 14px 55px;
+  background: var(--bg-app);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  background: var(--bg-card);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+}
+
+/* --- CATEGORIES PILLS --- */
+.category-pill {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 12px 24px;
+  border-radius: 20px;
+  min-width: 180px;
+  color: var(--text-main);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.active-cat {
+  background: var(--primary-gradient) !important;
+  color: white !important;
+  border-color: transparent;
+  box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+}
+
+.cat-icon-box {
+  width: 40px; height: 40px;
+  background: var(--bg-app);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary);
+}
+
+.active-cat .cat-icon-box {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* --- CARTES PRODUITS --- */
+.product-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 25px;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.product-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+}
+
+.product-img-container {
+  height: 220px;
+  background-color: var(--bg-app);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.product-img-container img {
+  transition: transform 0.6s ease;
+}
+
+.product-card:hover .product-img-container img {
+  transform: scale(1.1);
+}
+
+/* --- BADGES & PRIX --- */
+.badge-status {
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  backdrop-filter: blur(8px);
+}
+
+.status-ok { background: rgba(16, 185, 129, 0.9); color: white; }
+.status-alert { background: rgba(239, 68, 68, 0.9); color: white; }
+
+.price-tag {
+  color: var(--primary);
+  font-weight: 900;
+  font-size: 1.2rem;
+}
+
+/* --- STOCK & PROGRESS --- */
+.progress-modern {
+  height: 8px;
+  background-color: var(--bg-app);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar-modern {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 1s ease-in-out;
+}
+
+/* --- ACTIONS --- */
+.btn-action-circle {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-app);
+  color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-action-circle:hover {
+  background: var(--primary);
+  color: white !important;
+  border-color: var(--primary);
+  transform: rotate(10deg);
+}
+
+/* --- PAGINATION NEO --- */
+.pagination-neo {
+  background: var(--bg-card);
+  padding: 10px 25px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.pag-btn {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-app);
+  color: var(--text-main);
+  transition: 0.3s;
+}
+
+.pag-btn:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+}
+
+/* --- MODAL --- */
+.modal-neo {
+  background-color: var(--bg-card) !important;
+  border-radius: 30px;
+  border: 1px solid var(--border-color);
+}
+
+.custom-input {
+  background-color: var(--bg-app) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: 15px;
+  padding: 12px;
+}
+
+.btn-primary-gradient {
+  background: var(--primary-gradient);
+  border: none;
+  color: white;
+  box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+}
+
+/* --- UTILS --- */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.fw-black { font-weight: 900; }
+.shadow-soft { box-shadow: var(--shadow-soft); }

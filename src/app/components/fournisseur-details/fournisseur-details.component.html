@@ -1,0 +1,92 @@
+<div class="container py-4" *ngIf="fournisseur; else loader">
+  <nav class="mb-4">
+    <button class="btn btn-link text-decoration-none p-0 text-muted small shadow-none" (click)="retour()">
+      <i class="bi bi-arrow-left"></i> Retour aux fournisseurs
+    </button>
+  </nav>
+
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm p-4 text-center mb-4" style="border-radius: 20px;">
+        <div class="bg-success-subtle d-inline-block p-4 rounded-circle mx-auto mb-3">
+          <i class="bi bi-building text-success h1 mb-0"></i>
+        </div>
+        <h3 class="fw-bold text-dark">{{ fournisseur.nom }}</h3>
+        <span class="badge bg-light text-success border border-success-subtle mb-4">Partenaire Certifié</span>
+
+        <div class="text-start border-top pt-4">
+          <div class="mb-3">
+            <label class="small text-muted fw-bold text-uppercase d-block mb-1">Téléphone</label>
+            <p class="fw-bold mb-0 text-dark">
+              <i class="bi bi-telephone me-2 text-primary"></i>{{ fournisseur.telephone || 'Non renseigné' }}
+            </p>
+          </div>
+          <div class="mb-0">
+            <label class="small text-muted fw-bold text-uppercase d-block mb-1">Email professionnel</label>
+            <p class="fw-bold mb-0 text-dark text-truncate">
+              <i class="bi bi-envelope me-2 text-primary"></i>{{ fournisseur.email || 'N/A' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm p-3 bg-primary text-white" style="border-radius: 20px;">
+        <div class="d-flex align-items-center">
+          <div class="h2 mb-0 me-3 fw-bold">{{ produitsFournis.length }}</div>
+          <div class="small lh-sm text-uppercase fw-bold opacity-75">Références<br>fournies</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm p-4" style="border-radius: 20px;">
+        <h5 class="fw-bold text-dark mb-4">Catalogue de ce fournisseur</h5>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="text-muted small">
+            <tr>
+              <th class="border-0 pb-3">PRODUIT</th>
+              <th class="border-0 pb-3">PRIX VENTE</th>
+              <th class="border-0 pb-3">EN STOCK</th>
+              <th class="border-0 pb-3 text-end">ACTION</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let p of produitsFournis">
+              <td class="py-3">
+                <div class="fw-bold text-dark">{{ p.designation }}</div>
+                <div class="small text-muted">{{ p.categorie?.nom }}</div>
+              </td>
+              <td class="fw-bold">{{ p.prixUnitaire | number }} FCFA</td>
+              <td>
+                  <span class="badge rounded-pill"
+                        [ngClass]="p.quantiteStock <= p.seuilAlerte ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'">
+                    {{ p.quantiteStock }} unités
+                  </span>
+              </td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-light border rounded-pill px-3" (click)="voirProduit(p.id!)">
+                  Détails <i class="bi bi-eye ms-1"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="produitsFournis.length === 0">
+              <td colspan="4" class="text-center py-5 text-muted fst-italic">
+                <i class="bi bi-info-circle me-2"></i>Ce fournisseur n'est associé à aucun produit.
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loader>
+  <div class="text-center py-5">
+    <div class="spinner-border text-success mb-3"></div>
+    <p class="text-muted">Récupération de la fiche partenaire...</p>
+  </div>
+</ng-template>

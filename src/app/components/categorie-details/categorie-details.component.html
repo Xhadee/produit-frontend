@@ -1,0 +1,81 @@
+<div class="container py-4" *ngIf="categorie; else loader">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <button class="btn btn-light btn-sm rounded-pill px-3 border shadow-sm" (click)="retour()">
+      <i class="bi bi-arrow-left me-2"></i>Toutes les catégories
+    </button>
+    <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill">ID Catégorie: #{{ categorie.id }}</span>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm p-4 text-white"
+           style="border-radius: 20px; background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h1 class="fw-bold mb-2">{{ categorie.nom }}</h1>
+            <p class="opacity-75 mb-0 fs-5">{{ categorie.description || 'Aucune description détaillée.' }}</p>
+          </div>
+          <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <div class="bg-white bg-opacity-25 d-inline-block p-3 rounded-4 text-center" style="min-width: 120px;">
+              <div class="h2 fw-bold mb-0">{{ produitsAssocies.length }}</div>
+              <div class="small text-uppercase fw-bold" style="font-size: 0.7rem;">Produits rattachés</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <h4 class="fw-bold text-dark mb-3 mt-2">Articles dans cette catégorie</h4>
+
+      <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 15px;">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light text-muted small">
+            <tr>
+              <th class="ps-4 py-3">DÉSIGNATION</th>
+              <th>PRIX UNITAIRE</th>
+              <th>STOCK ACTUEL</th>
+              <th>STATUT</th>
+              <th class="text-end pe-4">ACTION</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let p of produitsAssocies" class="cursor-pointer">
+              <td class="ps-4 fw-bold text-dark">{{ p.designation }}</td>
+              <td>{{ p.prixUnitaire | number }} FCFA</td>
+              <td>
+                  <span [ngClass]="p.quantiteStock <= p.seuilAlerte ? 'text-danger fw-bold' : ''">
+                    {{ p.quantiteStock }}
+                  </span>
+              </td>
+              <td>
+                  <span class="badge rounded-pill px-3 py-2"
+                        [ngClass]="p.quantiteStock <= p.seuilAlerte ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'">
+                    {{ p.quantiteStock <= p.seuilAlerte ? 'Critique' : 'Sain' }}
+                  </span>
+              </td>
+              <td class="text-end pe-4">
+                <button class="btn btn-sm btn-outline-primary rounded-pill px-3" (click)="voirProduit(p.id!)">
+                  Fiche produit
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="produitsAssocies.length === 0">
+              <td colspan="5" class="text-center py-5 text-muted fst-italic">
+                Aucun produit n'est actuellement lié à cette catégorie.
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loader>
+  <div class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
+</ng-template>

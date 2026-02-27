@@ -1,0 +1,86 @@
+.navbar {
+  height: 80px;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+/* --- COULEURS ADAPTATIVES --- */
+.nav-title, .user-name, .user-name-alt {
+  color: var(--text-main) !important;
+}
+
+.nav-welcome, .user-role, .user-email-alt, .nav-chevron, .btn-toggle {
+  color: var(--text-muted) !important;
+}
+
+/* --- LE CERCLE XH (FIX DÉFINITIF) --- */
+.avatar-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  color: #ffffff !important; /* Force le blanc car le fond bleu est fixe */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+
+/* --- RECHERCHE --- */
+.search-field {
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  width: 350px;
+}
+
+.search-field i {
+  color: var(--text-muted);
+}
+
+.search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  padding-left: 10px;
+  color: var(--text-main) !important; /* Le texte écrit sera visible en blanc sur noir */
+}
+
+/* --- DROPDOWN --- */
+.nav-dropdown {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  width: 220px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  z-index: 1000;
+}
+
+.drop-item {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  color: var(--text-main);
+  border-radius: 8px;
+}
+
+.drop-item:hover {
+  background-color: var(--bg-app);
+}
+
+.btn-toggle { background: transparent; border: none; }
+.profile-btn { background: transparent; border: none; }
+.nav-chevron { transition: transform 0.3s; }
+.nav-chevron.rotated { transform: rotate(180deg); }

@@ -1,0 +1,150 @@
+<!-- produit-details.component.html -->
+<div class="product-details-container" *ngIf="produit; else loader">
+  <!-- En-tête avec navigation et actions -->
+  <header class="page-header">
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+      <ol class="breadcrumb-list">
+        <li class="breadcrumb-item">
+          <a (click)="retour()" class="breadcrumb-link">Catalogue</a>
+        </li>
+        <li class="breadcrumb-item active">Fiche Produit</li>
+      </ol>
+    </nav>
+
+    <div class="header-content">
+      <h1 class="product-title">{{ produit.designation }}</h1>
+
+      <div class="action-buttons">
+        <button class="btn-icon btn-return" (click)="retour()">
+          <i class="bi bi-arrow-left"></i>
+          <span>Retour</span>
+        </button>
+        <div class="btn-divider"></div>
+        <button class="btn-icon btn-success" (click)="enregistrerMouvement(TypeMvt.ENTREE)">
+          <i class="bi bi-plus-lg"></i>
+          <span>Entrée</span>
+        </button>
+        <button class="btn-icon btn-danger" (click)="enregistrerMouvement(TypeMvt.SORTIE)">
+          <i class="bi bi-dash-lg"></i>
+          <span>Sortie</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Grille principale -->
+  <div class="details-grid">
+    <!-- Colonne gauche : Historique des mouvements -->
+    <div class="history-card">
+      <div class="card-header">
+        <div class="header-icon">
+          <i class="bi bi-clock-history"></i>
+        </div>
+        <h5>Flux Récents</h5>
+      </div>
+
+      <div class="history-list">
+        <table class="history-table">
+          <tbody>
+          <tr *ngFor="let mvt of mouvements" class="history-row">
+            <td class="date-cell">
+              <span class="date-day">{{ mvt.dateMouvement | date:'dd MMM' }}</span>
+              <span class="date-time">{{ mvt.dateMouvement | date:'HH:mm' }}</span>
+            </td>
+            <td class="type-cell">
+                <span class="movement-badge" [class.entree]="mvt.type === TypeMvt.ENTREE" [class.sortie]="mvt.type === TypeMvt.SORTIE">
+                  {{ mvt.type }}
+                </span>
+            </td>
+            <td class="quantity-cell" [class.text-entree]="mvt.type === TypeMvt.ENTREE" [class.text-sortie]="mvt.type === TypeMvt.SORTIE">
+              {{ mvt.type === TypeMvt.ENTREE ? '+' : '-' }}{{ mvt.quantite }}
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="mouvements.length === 0" class="empty-state">
+          <i class="bi bi-inbox"></i>
+          <p>Aucune activité récente</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colonne centrale : Informations produit -->
+    <div class="product-info-card">
+      <!-- Image et catégorie -->
+      <div class="product-header">
+        <div class="product-image">
+          <img [src]="produit.imageUrl || 'https://placehold.co/200x200?text=Produit'"
+               (error)="$any($event.target).src = 'https://placehold.co/200x200?text=Indisponible'"
+               alt="{{ produit.designation }}">
+        </div>
+        <div class="product-meta">
+          <span class="category-badge">{{ produit.categorie?.nom || 'Non catégorisé' }}</span>
+          <span class="product-id">#{{ produit.id?.toString()?.padStart(5, '0') }}</span>
+        </div>
+      </div>
+
+      <!-- Prix -->
+      <div class="price-section">
+        <span class="price-label">Prix de vente</span>
+        <div class="price-value">
+          {{ produit.prixUnitaire | number }} <span class="currency">FCFA</span>
+        </div>
+      </div>
+
+      <!-- Fournisseur -->
+      <div class="supplier-section">
+        <div class="supplier-info">
+          <i class="bi bi-building-check"></i>
+          <div>
+            <span class="supplier-label">Fournisseur officiel</span>
+            <span class="supplier-name">{{ produit.fournisseur?.nom || 'Non spécifié' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Information temps réel -->
+      <div class="info-alert">
+        <i class="bi bi-info-circle-fill"></i>
+        <p>Données synchronisées en temps réel avec le dépôt principal</p>
+      </div>
+    </div>
+
+    <!-- Colonne droite : État du stock -->
+    <div class="stock-card">
+      <!-- Stock actuel -->
+      <div class="stock-header">
+        <span class="stock-label">Stock Actuel</span>
+        <div class="stock-circle" [class.critical]="(produit.quantiteStock || 0) <= (produit.seuilAlerte || 0)">
+          <span class="stock-number">{{ produit.quantiteStock }}</span>
+        </div>
+        <span class="stock-status" [class.critical]="(produit.quantiteStock || 0) <= (produit.seuilAlerte || 0)">
+          {{ (produit.quantiteStock || 0) <= (produit.seuilAlerte || 0) ? 'RÉAPPROVISIONNER' : 'STOCK OPTIMAL' }}
+        </span>
+      </div>
+
+      <!-- Seuil d'alerte -->
+      <div class="seuil-section">
+        <div class="seuil-info">
+          <span>Seuil d'alerte</span>
+          <span class="seuil-value">{{ produit.seuilAlerte }} u.</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill"
+               [style.width.%]="(produit.quantiteStock! / (produit.seuilAlerte! * 2)) * 100"
+               [class.bg-critical]="(produit.quantiteStock || 0) <= (produit.seuilAlerte || 0)">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Template de chargement -->
+<ng-template #loader>
+  <div class="loader-container">
+    <div class="loader-spinner"></div>
+    <p>Chargement des données produit...</p>
+  </div>
+</ng-template>
