@@ -1,0 +1,121 @@
+<div class="dashboard-wrapper p-4">
+  <div class="welcome-section mb-5 animate__animated animate__fadeInDown">
+    <h1 class="fw-black title-gradient">Vue d'ensemble</h1>
+    <p class="text-muted">Analyse en temps réel de votre inventaire et de vos performances</p>
+  </div>
+
+  <div class="row g-4 mb-5">
+    <div class="col-md-3">
+      <div class="stat-card glass-card p-4 h-100">
+        <div class="icon-circle bg-primary-soft text-primary"><i class="bi bi-box-seam"></i></div>
+        <div class="mt-3">
+          <span class="text-muted small fw-bold text-uppercase">Total Produits</span>
+          <h2 class="fw-black mb-0">{{ totalProduits }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="stat-card glass-card p-4 h-100">
+        <div class="icon-circle bg-success-soft text-success"><i class="bi bi-currency-dollar"></i></div>
+        <div class="mt-3">
+          <span class="text-muted small fw-bold text-uppercase">Valeur Stock</span>
+          <h2 class="fw-black mb-0 text-truncate">{{ valeurStock | number }} <small class="h6">FCFA</small></h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="stat-card glass-card p-4 h-100 border-alert">
+        <div class="icon-circle bg-danger-soft text-danger"><i class="bi bi-exclamation-triangle"></i></div>
+        <div class="mt-3">
+          <span class="text-muted small fw-bold text-uppercase">Alertes Stock</span>
+          <h2 class="fw-black mb-0 text-danger">{{ alertesCount }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="stat-card glass-card p-4 h-100">
+        <div class="icon-circle bg-info-soft text-info"><i class="bi bi-tags"></i></div>
+        <div class="mt-3">
+          <span class="text-muted small fw-bold text-uppercase">Catégories</span>
+          <h2 class="fw-black mb-0">{{ categoriesCount }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="fw-bold mb-0">Répartition par Catégorie</h5>
+          <i class="bi bi-pie-chart text-muted"></i>
+        </div>
+        <div class="chart-container" style="height: 300px; position: relative;">
+          <canvas *ngIf="chartData.datasets.length > 0"
+                  baseChart
+                  [data]="chartData"
+                  [options]="chartOptions"
+                  [type]="'doughnut'">
+          </canvas>
+          <div *ngIf="chartData.datasets.length === 0" class="h-100 d-flex align-items-center justify-content-center">
+            <p class="text-muted italic">Aucune donnée disponible pour le graphique</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="d-flex flex-column gap-4 h-100">
+
+        <div class="glass-card p-4 flex-grow-1">
+          <h6 class="fw-bold mb-3 d-flex align-items-center">
+            <i class="bi bi-lightning-charge-fill text-warning me-2"></i>
+            Urgences Stock
+          </h6>
+
+          <div *ngIf="topAlertes.length === 0" class="text-center py-4">
+            <i class="bi bi-check-circle text-success fs-1"></i>
+            <p class="text-muted small mt-2">Tout est sous contrôle !</p>
+          </div>
+
+          <div class="list-group list-group-flush" *ngIf="topAlertes.length > 0">
+            <div *ngFor="let p of topAlertes" class="list-group-item bg-transparent px-0 border-light d-flex justify-content-between align-items-center animate__animated animate__fadeIn">
+              <div>
+                <div class="fw-bold small">{{ p.designation }}</div>
+                <div class="text-muted tiny">ID: {{ p.id }}</div>
+              </div>
+              <div class="text-end">
+                <span class="badge rounded-pill px-3 py-2"
+                      [ngClass]="(p.quantiteStock ?? 0) === 0 ? 'bg-danger' : 'bg-warning text-dark'">
+                  {{ p.quantiteStock }} en stock
+                </span>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-link btn-sm w-100 mt-2 text-decoration-none" routerLink="/produits">
+            Voir tous les produits <i class="bi bi-arrow-right ms-1"></i>
+          </button>
+        </div>
+
+        <div class="glass-card p-4 bg-gradient-dark">
+          <h5 class="fw-bold text-white mb-4">Raccourcis Actions</h5>
+          <div class="d-grid gap-3">
+            <button class="btn btn-glass text-start" routerLink="/produits">
+              <i class="bi bi-box-seam me-2"></i> Consulter le Stock complet
+            </button>
+            <button class="btn btn-glass text-start" routerLink="/analyse">
+              <i class="bi bi-robot me-2"></i> Lancer l'Analyse IA
+            </button>
+            <button class="btn btn-glass-danger text-start shadow-sm" (click)="genererRapportPDF()">
+              <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> Télécharger le Rapport PDF
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

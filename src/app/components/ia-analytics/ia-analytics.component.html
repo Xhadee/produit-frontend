@@ -1,95 +1,133 @@
-<div class="header-section mb-5">
-  <div class="d-flex align-items-center justify-content-between">
+<div class="ia-header mb-4 p-4 rounded-5 shadow-sm bg-white border-start border-primary border-5">
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
     <div>
-      <h2 class="fw-bold text-dark mb-1">
-        <i class="bi bi-stars text-primary me-2"></i>Intelligence Prédictive
-      </h2>
-      <p class="text-muted mb-0">Analyse algorithmique des flux et prévisions de rupture.</p>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <div class="ai-pulse"></div>
+        <h2 class="fw-black text-dark mb-0 font-heading">IA Prédictive & Flux</h2>
+      </div>
+      <p class="text-secondary mb-0 opacity-75">Analyse algorithmique en temps réel des risques de rupture de stock.</p>
     </div>
-    <div class="badge bg-primary-subtle text-primary p-2 px-3 rounded-pill border border-primary-subtle">
-      Moteur IA Actif
+    <div class="status-pill d-flex align-items-center gap-2 bg-dark text-white p-2 px-4 rounded-pill shadow-lg">
+      <i class="bi bi-cpu-fill ai-icon-spin"></i>
+      <span class="small fw-bold text-uppercase tracking-wider">Moteur Neural Actif</span>
     </div>
   </div>
 </div>
 
+<div class="search-container mb-5" *ngIf="!chargement">
+  <div class="glass-search d-flex align-items-center px-4 shadow-sm">
+    <i class="bi bi-search text-primary fs-5 me-3"></i>
+    <input type="text"
+           [(ngModel)]="searchTerm"
+           (input)="filtrerPredictions()"
+           class="form-control border-0 bg-transparent py-3 shadow-none"
+           placeholder="Rechercher un produit, une tendance (HAUSSE, STABLE)...">
+
+    <div class="search-badge ms-2 d-none d-md-flex" *ngIf="searchTerm">
+      <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle">
+        {{ predictionsFiltrees.length }} résultat(s)
+      </span>
+    </div>
+
+    <button *ngIf="searchTerm" (click)="resetSearch()" class="btn btn-link text-muted p-0 ms-2">
+      <i class="bi bi-x-circle-fill"></i>
+    </button>
+  </div>
+</div>
+
 <div class="row g-4" *ngIf="!chargement; else loader">
-  <div class="col-xl-4 col-md-6" *ngFor="let p of predictions">
-    <div class="card border-0 shadow-lg h-100 position-relative overflow-hidden transition-hover" style="border-radius: 28px;">
 
-      <div class="position-relative" style="height: 160px;">
-        <img [src]="p.imageUrl || 'https://placehold.co/400x200?text=Produit'"
-             class="w-100 h-100" style="object-fit: cover;" [alt]="p.nomProduit">
+  <div class="col-xl-4 col-md-6" *ngFor="let p of predictionsFiltrees">
+    <div class="card ai-card border-0 h-100 position-relative overflow-hidden">
 
-        <div class="position-absolute bottom-0 start-0 w-100 p-3"
-             style="background: linear-gradient(transparent, rgba(0,0,0,0.7));">
-          <h5 class="fw-bold text-white mb-0 text-truncate">{{ p.nomProduit }}</h5>
-        </div>
+      <div class="card-img-wrapper position-relative">
+        <img [src]="p.imageUrl || 'assets/img/default-product.png'"
+             class="card-img-top shadow-sm" [alt]="p.nomProduit">
+
+        <div class="overlay-gradient"></div>
 
         <div class="position-absolute top-0 end-0 p-3">
           <span [ngClass]="{
-            'bg-danger': p.tendance === 'HAUSSE',
-            'bg-success': p.tendance === 'BAISSE',
-            'bg-info': p.tendance === 'STABLE'
-          }" class="badge rounded-pill shadow px-3 py-2 border border-white border-2">
-            {{ p.tendance }} <i class="bi" [ngClass]="p.tendance === 'HAUSSE' ? 'bi-graph-up-arrow' : 'bi-graph-down-arrow'"></i>
+            'tendance-up': p.tendance === 'HAUSSE',
+            'tendance-down': p.tendance === 'BAISSE',
+            'tendance-stable': p.tendance === 'STABLE'
+          }" class="badge-tendance shadow-lg">
+            <i class="bi" [ngClass]="p.tendance === 'HAUSSE' ? 'bi-graph-up-arrow' : 'bi-graph-down-arrow'"></i>
+            {{ p.tendance }}
           </span>
         </div>
+
+        <div class="product-title-overlay p-3">
+          <h5 class="fw-bold text-white mb-0 text-truncate">{{ p.nomProduit }}</h5>
+        </div>
       </div>
 
-      <div class="card-body p-4">
-        <div class="d-flex align-items-center mb-4 bg-light rounded-4 p-2 border border-light-subtle">
-          <div class="prediction-circle me-3 d-flex flex-column align-items-center justify-content-center shadow-sm"
-               [ngClass]="p.joursRestants < 5 ? 'danger' : 'safe'">
-            <span class="h3 fw-black mb-0">{{ p.joursRestants }}</span>
-            <span class="small fw-bold text-uppercase" style="font-size: 0.55rem;">Jours</span>
+      <div class="card-body p-4 pt-0">
+        <div class="prediction-box d-flex align-items-center shadow-sm">
+          <div class="days-counter" [ngClass]="p.joursRestants < 5 ? 'critical' : 'normal'">
+            <span class="number">{{ p.joursRestants }}</span>
+            <span class="label">Jours</span>
           </div>
-          <div>
-            <div class="small text-muted">Estimation de rupture</div>
-            <div class="fw-bold text-dark">{{ p.dateRupturePrevue | date:'dd MMM yyyy' }}</div>
-          </div>
-        </div>
-
-        <div class="row g-2 mb-4">
-          <div class="col-6">
-            <div class="p-3 rounded-4 border border-danger-subtle bg-danger-subtle bg-opacity-10 h-100">
-              <div class="small text-muted mb-1">Impact Risque</div>
-              <div class="fw-bold text-danger">{{ p.impactFinancier | number:'1.0-0' }} <small>CFA</small></div>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="p-3 rounded-4 border border-primary-subtle bg-primary-subtle bg-opacity-10 h-100">
-              <div class="small text-muted mb-1">Commande IA</div>
-              <div class="fw-bold text-primary">+ {{ p.quantiteSuggeree }} u.</div>
-            </div>
+          <div class="ms-3">
+            <div class="text-label text-uppercase small text-muted">Rupture estimée</div>
+            <div class="text-date fw-black text-dark">{{ p.dateRupturePrevue | date:'dd MMM yyyy' }}</div>
           </div>
         </div>
 
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-1">
-            <span class="small text-muted">Indice de confiance</span>
-            <span class="small fw-bold">{{ p.confianceIA * 100 | number:'1.0-0' }}%</span>
+        <div class="row g-3 mb-4 mt-2">
+          <div class="col-6">
+            <div class="metric-card bg-danger-soft">
+              <span class="metric-label">Impact Risque</span>
+              <span class="metric-value text-danger">{{ p.impactFinancier | number:'1.0-0' }} <small>CFA</small></span>
+            </div>
           </div>
-          <div class="progress shadow-sm" style="height: 7px; border-radius: 10px; background-color: #eee;">
-            <div class="progress-bar progress-bar-striped progress-bar-animated"
+          <div class="col-6">
+            <div class="metric-card bg-primary-soft">
+              <span class="metric-label">Suggéré par l'IA</span>
+              <span class="metric-value text-primary">+ {{ p.quantiteSuggeree }} <small>u.</small></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="confiance-section mb-4">
+          <div class="d-flex justify-content-between align-items-end mb-2">
+            <span class="small fw-bold text-muted text-uppercase">Indice de fiabilité IA</span>
+            <span class="h6 mb-0 fw-black" [style.color]="getConfianceColor(p.confianceIA)">
+              {{ p.confianceIA * 100 | number:'1.0-0' }}%
+            </span>
+          </div>
+          <div class="progress-container shadow-sm">
+            <div class="progress-bar-custom"
                  [style.width.%]="p.confianceIA * 100"
-                 [style.background-color]="getConfianceColor(p.confianceIA)"></div>
+                 [style.background]="getConfianceColor(p.confianceIA)">
+            </div>
           </div>
         </div>
 
-        <div class="p-3 bg-light rounded-4 border-0 position-relative">
-          <i class="bi bi-quote text-primary opacity-25 position-absolute top-0 start-0 m-2 h4"></i>
-          <p class="small mb-0 fst-italic text-dark ps-3">
-            {{ p.message }}
-          </p>
+        <div class="ai-insight p-3 rounded-4">
+          <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+          <span class="small text-dark fw-medium">{{ p.message }}</span>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="col-12 text-center py-5" *ngIf="predictionsFiltrees.length === 0">
+    <div class="empty-state-ia p-5 rounded-5 bg-white shadow-sm border border-dashed">
+      <i class="bi bi-robot text-muted display-1 opacity-25"></i>
+      <h3 class="mt-4 fw-bold">Aucune analyse trouvée</h3>
+      <p class="text-muted">L'IA n'a trouvé aucun produit correspondant à "{{ searchTerm }}"</p>
+      <button class="btn btn-primary rounded-pill px-4" (click)="resetSearch()">
+        Voir tous les produits
+      </button>
     </div>
   </div>
 </div>
 
 <ng-template #loader>
-  <div class="text-center py-5">
-    <div class="spinner-grow text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
-    <p class="text-muted mt-3 fw-medium">L'IA parcourt vos entrepôts numériques...</p>
+  <div class="loader-container">
+    <div class="ai-scanner"></div>
+    <div class="spinner-border text-primary shadow-sm" style="width: 3rem; height: 3rem;" role="status"></div>
+    <p class="mt-4 fw-bold text-primary tracking-widest text-uppercase">Scan neuronal des stocks en cours...</p>
   </div>
 </ng-template>

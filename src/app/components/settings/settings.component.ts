@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { UtilisateurService, Utilisateur } from '../../services/utilisateur.service';
+import { UtilisateurService } from '../../services/utilisateur.service';
 
 @Component({
   selector: 'app-settings',
@@ -11,13 +11,18 @@ import { UtilisateurService, Utilisateur } from '../../services/utilisateur.serv
   styleUrl: './settings.component.css'
 })
 export class SettingsComponent implements OnInit {
-  activeTab: string = 'profil';
-  settingsForm!: FormGroup;
-  isLoading = false;
-  messageFeedback = { type: '', text: '' };
-
   private fb = inject(FormBuilder);
   private utilisateurService = inject(UtilisateurService);
+
+  // État de l'interface
+  activeTab: string = 'profil'; // profil | securite | preferences
+  isLoading = false;
+  isSaving = false;
+
+  // Feedback visuel
+  messageFeedback = { type: '', text: '' };
+
+  settingsForm!: FormGroup;
 
   languages = [
     { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -29,19 +34,30 @@ export class SettingsComponent implements OnInit {
     this.chargerDonneesUtilisateur();
   }
 
+  /**
+   * Initialisation du formulaire réactif
+   */
   initForm() {
     this.settingsForm = this.fb.group({
-      id: [null], // Important pour l'update
-      username: [{ value: '', disabled: true }], // On ne change pas le username généralement
-      nom: ['', [Validators.required]],
+      id: [null],
+      username: [{ value: '', disabled: true }], // Lecture seule
+      nom: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      password: [''], // Optionnel pour le changement
-      // Paramètres locaux (peuvent rester en local ou être ajoutés au modèle)
+
+      // Sécurité
+      currentPassword: [''],
+      newPassword: ['', [Validators.minLength(6)]],
+
+      // Préférences (Stockage local ou étendu)
       langue: ['fr'],
-      seuilAlerte: [5],
+      seuilAlerte: [5, [Validators.required, Validators.min(1)]],
+      notificationsEmail: [true]
     });
   }
 
+  /**
+   * Récupération des données du profil "Moi"
+   */
   chargerDonneesUtilisateur() {
     this.isLoading = true;
     this.utilisateurService.getMe().subscribe({
@@ -51,44 +67,66 @@ export class SettingsComponent implements OnInit {
           username: user.username,
           nom: user.nom,
           email: user.email,
-          seuilAlerte: 5 // Valeur par défaut si non gérée par l'objet User
+          // Récupération des préférences depuis le stockage local si non présentes en DB
+          langue: localStorage.getItem('app_lang') || 'fr',
+          seuilAlerte: localStorage.getItem('app_seuil_alerte') || 5
         });
         this.isLoading = false;
       },
-      error: (err) => {
-        this.showFeedback('danger', 'Impossible de charger le profil');
+      error: () => {
+        this.showFeedback('danger', 'Erreur lors de la récupération du profil');
         this.isLoading = false;
       }
     });
   }
 
+  /**
+   * Enregistrement des modifications
+   */
+  onSubmit() {
+    if (this.settingsForm.invalid) {
+      this.showFeedback('warning', 'Veuillez remplir correctement tous les champs obligatoires');
+      return;
+    }
+
+    this.isSaving = true;
+    const formData = this.settingsForm.getRawValue();
+
+    this.utilisateurService.updateProfil(formData).subscribe({
+      next: () => {
+        this.showFeedback('success', 'Vos modifications ont été enregistrées');
+        this.isSaving = false;
+
+        // Persistance locale des préférences UI
+        localStorage.setItem('app_lang', formData.langue);
+        localStorage.setItem('app_seuil_alerte', formData.seuilAlerte.toString());
+
+        // Nettoyage des champs de mot de passe après succès
+        this.settingsForm.patchValue({ currentPassword: '', newPassword: '' });
+      },
+      error: (err) => {
+        const errorMsg = err.error?.message || 'Une erreur est survenue lors de la sauvegarde';
+        this.showFeedback('danger', errorMsg);
+        this.isSaving = false;
+      }
+    });
+  }
+
+  /**
+   * Navigation entre les sections (Profil / Sécurité / Paramètres)
+   */
   setTab(tab: string) {
     this.activeTab = tab;
   }
 
-  onSubmit() {
-    if (this.settingsForm.valid) {
-      this.isLoading = true;
-      // On récupère toutes les valeurs, y compris les champs désactivés si besoin
-      const userData = this.settingsForm.getRawValue();
-
-      this.utilisateurService.updateProfil(userData).subscribe({
-        next: (response) => {
-          this.showFeedback('success', 'Profil mis à jour avec succès !');
-          this.isLoading = false;
-          // Si un mot de passe a été saisi, on vide le champ après succès
-          this.settingsForm.get('password')?.reset();
-        },
-        error: (err) => {
-          this.showFeedback('danger', 'Erreur lors de la mise à jour');
-          this.isLoading = false;
-        }
-      });
-    }
-  }
-
+  /**
+   * Gestion de l'affichage des alertes de feedback
+   */
   private showFeedback(type: string, text: string) {
     this.messageFeedback = { type, text };
-    setTimeout(() => this.messageFeedback = { type: '', text: '' }, 4000);
+    setTimeout(() => this.messageFeedback = { type: '', text: '' }, 3000);
   }
+
+  // Helper pour l'affichage des erreurs dans le HTML
+  get f() { return this.settingsForm.controls; }
 }

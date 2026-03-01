@@ -1,0 +1,40 @@
+.history-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.list-group-item {
+  transition: all 0.2s ease;
+  border-left: 5px solid transparent;
+}
+
+.list-group-item:hover {
+  background-color: #f8fafc;
+  transform: translateX(5px);
+}
+
+.icon-box {
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.border-start-4 {
+  border-left-width: 6px !important;
+}
+
+.bg-danger-subtle { background-color: #fff5f5 !important; }
+.bg-info-subtle { background-color: #f0f9ff !important; }
+
+/* Animation d'entrée */
+.list-group-item {
+  animation: slideIn 0.4s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

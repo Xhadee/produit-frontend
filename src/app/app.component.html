@@ -1,16 +1,22 @@
-<app-welcome-screen></app-welcome-screen>
+<app-welcome-screen *ngIf="isLoading" class="welcome-overlay"></app-welcome-screen>
 
-<div class="app-layout" [class.sidebar-collapsed]="isCollapsed">
+<div class="app-container" [class.welcome-active]="isLoading">
 
-  <app-sidebar [isCollapsed]="isCollapsed"></app-sidebar>
+  <div *ngIf="showInterface()" class="dashboard-layout" [class.collapsed]="isCollapsed">
 
-  <main class="main-wrapper">
-    <app-navbar (toggleSidebar)="toggleSidebar()"></app-navbar>
+    <app-sidebar [isCollapsed]="isCollapsed"></app-sidebar>
 
-    <div class="page-content">
-      <div class="content-container p-4 animate-page">
+    <div class="main-content">
+      <app-navbar (toggleSidebar)="toggleSidebar()"></app-navbar>
+
+      <main class="content-area p-4">
         <router-outlet></router-outlet>
-      </div>
+      </main>
     </div>
-  </main>
+  </div>
+
+  <div *ngIf="!showInterface()" class="auth-layout">
+    <router-outlet></router-outlet>
+  </div>
+
 </div>

@@ -1,38 +1,64 @@
-:host {
-  --sidebar-width: 280px;
-  --sidebar-collapsed-width: 88px;
-  --transition-speed: 0.4s;
-  --transition-curve: cubic-bezier(0.075, 0.82, 0.165, 1);
+/* Conteneur principal */
+.app-container {
+  height: 100vh;
+  width: 100%;
+  transition: opacity 0.5s ease-in-out;
 }
 
-.app-layout {
+/* Effet de fondu quand le Welcome Screen est actif */
+.welcome-active {
+  opacity: 0;
+  pointer-events: none; /* Empêche de cliquer sur le dashboard pendant le loading */
+}
+
+/* Layout du Dashboard */
+.dashboard-layout {
   display: flex;
   height: 100vh;
-  width: 100vw;
   overflow: hidden;
-  background-color: var(--bg-app); /* Utilise la variable globale de styles.css */
+  background-color: #f8f9fa;
 }
 
-/* On définit juste comment le main réagit à la sidebar */
-.main-wrapper {
+/* Zone de contenu à droite de la Sidebar */
+.main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden;
-  transition: all var(--transition-speed) var(--transition-curve);
-}
-
-.page-content {
-  flex: 1;
   overflow-y: auto;
+  transition: all 0.3s ease;
 }
 
-.animate-page {
-  animation: fadeIn 0.5s ease-out;
+.content-area {
+  flex: 1;
 }
 
-@keyframes fadeIn {
+/* Layout spécial pour le Login (Centré et plein écran) */
+.auth-layout {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Animation de transition pour les pages (router-outlet) */
+.content-area {
+  animation: fadeInContent 0.6s ease-out;
+}
+
+@keyframes fadeInContent {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Assurer que l'écran de bienvenue recouvre tout si nécessaire */
+.welcome-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999; /* Toujours au-dessus de tout */
 }

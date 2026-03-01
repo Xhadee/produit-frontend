@@ -1,198 +1,226 @@
-/* --- BASE NAVBAR --- */
+/* --- Structure de la Navbar --- */
 .navbar {
-  height: 80px;
-  background-color: var(--bg-card);
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  transition: background-color 0.3s ease;
+  background-color: #ffffff;
+  height: 70px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+  transition: all 0.3s ease;
 }
 
-/* --- COULEURS ADAPTATIVES --- */
-.nav-title, .user-name, .user-name-alt, .notif-title {
-  color: var(--text-main) !important;
+/* --- Titres et Textes --- */
+.nav-title {
+  color: #2d3436;
+  font-size: 1.1rem;
+  letter-spacing: -0.5px;
 }
 
-.nav-welcome, .user-role, .user-email-alt, .nav-chevron, .btn-toggle, .notif-msg, .notif-date {
-  color: var(--text-muted) !important;
+.nav-welcome {
+  font-size: 0.85rem;
+  opacity: 0.8;
 }
 
-/* --- NOTIFICATIONS (LA CLOCHE) --- */
+/* --- Boutons et Effets Ripple --- */
+.ripple {
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.2s ease;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.ripple:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.btn-toggle i {
+  color: #636e72;
+}
+
+/* --- Bloc Notifications (Cloche & Badge) --- */
 .notif-btn {
-  background: var(--bg-app);
-  border: 1px solid var(--border-color);
-  color: var(--text-main);
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  color: #636e72;
+  transition: transform 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  transition: all 0.2s ease;
 }
 
 .notif-btn:hover {
-  background-color: var(--border-color);
-  transform: translateY(-2px);
+  transform: scale(1.1);
 }
 
-.notif-badge {
+/* Animation de secousse quand il y a des notifs */
+.bell-shake i {
+  display: inline-block;
+  animation: ring 4s 0.7s ease-in-out infinite;
+  transform-origin: 50% 4px;
+}
+
+/* Couleur dorée pour la cloche active */
+.bell-shake .bi-bell-fill {
+  color: #f1c40f !important;
+  filter: drop-shadow(0 0 2px rgba(241, 196, 15, 0.4));
+}
+
+/* Badge numérique rouge */
+.badge-count {
   position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #ef4444; /* Rouge vif moderne */
-  color: #ffffff;
+  top: 2px;
+  right: 2px;
+  background-color: #ff4757;
+  color: white;
   font-size: 10px;
   font-weight: 800;
   min-width: 18px;
   height: 18px;
-  padding: 0 4px;
-  border-radius: 6px;
-  border: 2px solid var(--bg-card);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 5px rgba(255, 71, 87, 0.4);
+  z-index: 10;
+  pointer-events: none; /* Le clic traverse le badge */
 }
 
-/* --- DROPDOWNS (PROFIL & NOTIFS) --- */
+/* --- Menus Déroulants (Dropdowns) --- */
 .nav-dropdown {
   position: absolute;
-  top: 120%;
+  top: calc(100% + 15px);
   right: 0;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
+  width: 300px;
+  background: #fff;
   border-radius: 12px;
-  z-index: 1000;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  z-index: 1100;
+  transform-origin: top right;
   overflow: hidden;
-  animation: slideDown 0.2s ease-out;
 }
 
 .notif-dropdown {
-  width: 320px;
+  width: 350px;
 }
 
+/* Scrollbar personnalisée */
 .notif-list-container {
-  max-height: 350px;
+  max-height: 400px;
   overflow-y: auto;
 }
 
-/* Style de la barre de défilement pour les notifs */
-.notif-list-container::-webkit-scrollbar { width: 5px; }
-.notif-list-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
 
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f8f9fa;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 10px;
+}
+
+/* --- Items de liste (Notifications) --- */
 .notif-item {
-  transition: background 0.2s;
-  cursor: default;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .notif-item:hover {
-  background-color: var(--bg-app);
+  background-color: #f8fafc;
 }
 
-/* --- CERCLE AVATAR (LE "XH") --- */
+.unread-bg {
+  background-color: #f0f7ff !important;
+  border-left: 4px solid #3b82f6; /* Marqueur bleu pour non lu */
+}
+
+/* --- Avatar et Profil --- */
 .avatar-circle {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-  color: #ffffff !important;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.9rem;
   font-weight: 700;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* --- BOUTONS & ITEMS --- */
-.btn-clear {
-  background: transparent;
-  border: none;
-  color: #3b82f6;
+.profile-btn:hover .avatar-circle {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.nav-chevron {
   font-size: 0.8rem;
-  font-weight: 600;
+  transition: transform 0.3s ease;
 }
 
-.btn-clear:hover { text-decoration: underline; }
-
-.btn-mark-read {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1.2rem;
-  line-height: 1;
+.nav-chevron.rotated {
+  transform: rotate(180deg);
 }
 
-.btn-mark-read:hover { color: #ef4444; }
-
+/* --- Items du Menu Profil --- */
 .drop-item {
-  width: 100%;
-  padding: 10px 15px;
-  background: transparent;
-  border: none;
-  text-align: left;
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  transition: background 0.2s;
+  font-size: 0.9rem;
+  color: #4b5563;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 2px;
 }
 
 .drop-item:hover {
-  background-color: var(--bg-app);
+  background-color: #f3f4f6;
+  color: #3b82f6;
+  padding-left: 12px !important;
 }
 
-/* --- ANIMATIONS & ÉTATS --- */
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
+/* --- Animations --- */
+@keyframes ring {
+  0% { transform: rotate(0); }
+  1% { transform: rotate(30deg); }
+  3% { transform: rotate(-28deg); }
+  5% { transform: rotate(34deg); }
+  7% { transform: rotate(-32deg); }
+  9% { transform: rotate(30deg); }
+  11% { transform: rotate(-28deg); }
+  13% { transform: rotate(26deg); }
+  15% { transform: rotate(-24deg); }
+  17% { transform: rotate(22deg); }
+  19% { transform: rotate(-20deg); }
+  21% { transform: rotate(18deg); }
+  23% { transform: rotate(-16deg); }
+  25% { transform: rotate(14deg); }
+  27% { transform: rotate(-12deg); }
+  29% { transform: rotate(10deg); }
+  31% { transform: rotate(-8deg); }
+  33% { transform: rotate(6deg); }
+  35% { transform: rotate(-4deg); }
+  37% { transform: rotate(2deg); }
+  39% { transform: rotate(-1deg); }
+  41% { transform: rotate(1deg); }
+  43% { transform: rotate(0); }
+  100% { transform: rotate(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.nav-chevron { transition: transform 0.3s; }
-.nav-chevron.rotated { transform: rotate(180deg); }
-
-.btn-toggle, .profile-btn { background: transparent; border: none; }
-
-.notif-icon.alerte { color: #f59e0b; }
-.notif-icon.info { color: #3b82f6; }
-.notif-msg { font-size: 0.85rem; line-height: 1.4; }
-
-/* Animation d'apparition en fondu */
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out;
+.animate__fadeInUp {
+  animation: fadeInUp 0.3s ease-out;
 }
 
-/* Animation de glissement pour les champs d'inscription */
-.animate-slide-down {
-  animation: slideDown 0.3s ease-out;
-}
-
-/* Animation de vibration en cas d'erreur */
-.animate-shake {
-  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideDown {
-  from { opacity: 0; max-height: 0; transform: translateY(-10px); }
-  to { opacity: 1; max-height: 200px; transform: translateY(0); }
-}
-
-@keyframes shake {
-  10%, 90% { transform: translate3d(-1px, 0, 0); }
-  20%, 80% { transform: translate3d(2px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-  40%, 60% { transform: translate3d(4px, 0, 0); }
-}
-
-/* Style des champs input group */
-.input-group-text {
-  color: #6c757d;
-  border-radius: 8px 0 0 8px;
-}
-.form-control {
-  border-radius: 0 8px 8px 0;
-}
+/* --- Utilitaires --- */
+.bg-primary-subtle { background-color: #eef2ff !important; color: #4f46e5 !important; }
+.bg-danger-subtle { background-color: #fef2f2 !important; color: #dc2626 !important; }
+.bg-info-subtle { background-color: #f0f9ff !important; color: #0ea5e9 !important; }
+.smaller { font-size: 0.75rem; }
+.transition-all { transition: all 0.2s ease-in-out; }

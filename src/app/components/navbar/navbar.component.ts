@@ -22,47 +22,59 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private utilisateurService = inject(UtilisateurService);
   private notificationService = inject(NotificationService);
 
+  // Données synchronisées
   currentUser: Utilisateur | null = null;
   notifications: Notification[] = [];
 
+  // États de l'interface
   profileMenuOpen = false;
   notifMenuOpen = false;
   searchQuery: string = '';
 
-  // Pour stocker l'abonnement et le couper proprement à la destruction du composant
   private userSub!: Subscription;
   private intervalId: any;
 
   ngOnInit(): void {
-    // SYNCHRONISATION EN TEMPS RÉEL :
-    // On s'abonne au BehaviorSubject du service.
-    // Dès que updateProfil() est appelé ailleurs, ce bloc s'exécute.
+    /**
+     * 1. SYNCHRONISATION RÉACTIVE
+     * On s'abonne au flux utilisateur. Dès que le login réussit,
+     * cet abonnement met à jour la Navbar instantanément.
+     */
     this.userSub = this.utilisateurService.user$.subscribe({
       next: (user) => {
         this.currentUser = user;
+        console.log('Navbar : Utilisateur synchronisé ->', user?.nom);
       }
     });
 
-    // Chargement initial (si le Subject est vide)
-    this.chargerProfil();
+    /**
+     * 2. CHARGEMENT INITIAL & REFRESH
+     * Si l'utilisateur est déjà dans le service (via localStorage),
+     * on n'appelle pas l'API. Sinon (cas d'un refresh F5), on récupère les infos.
+     */
+    if (!this.currentUser && localStorage.getItem('token')) {
+      this.chargerProfil();
+    }
+
     this.chargerNotifications();
 
-    // Polling des notifications
+    // 3. POLLING DES NOTIFICATIONS (30s)
     this.intervalId = setInterval(() => this.chargerNotifications(), 30000);
   }
 
   ngOnDestroy(): void {
-    // Nettoyage pour éviter les fuites de mémoire
     if (this.userSub) this.userSub.unsubscribe();
     if (this.intervalId) clearInterval(this.intervalId);
   }
 
-  // --- LOGIQUE API ---
+  // --- GESTION DES DONNÉES ---
 
   chargerProfil(): void {
-    // getMe() dans ton service fait maintenant un .next() sur le userSubject
     this.utilisateurService.getMe().subscribe({
-      error: (err) => console.error('Erreur profil:', err)
+      error: (err) => {
+        console.error('Session expirée ou invalide:', err);
+        this.deconnexion();
+      }
     });
   }
 
@@ -73,7 +85,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- ACTIONS NOTIFICATIONS ---
+  // --- ACTIONS ---
 
   marquerLue(id: number, event: Event): void {
     event.stopPropagation();
@@ -87,6 +99,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.notifications = [];
       this.notifMenuOpen = false;
     });
+  }
+
+  deconnexion(): void {
+    // On ferme les menus avant de partir
+    this.profileMenuOpen = false;
+    this.notifMenuOpen = false;
+
+    // Le service s'occupe de vider le localStorage et le userSubject
+    this.utilisateurService.logout();
+
+    // Redirection
+    this.router.navigate(['/login']);
   }
 
   // --- LOGIQUE INTERFACE ---
@@ -109,38 +133,33 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.profileMenuOpen = false;
   }
 
-  // Calcul dynamique des initiales (ex: "Xhadee Admin" -> "XA")
+  /**
+   * Calcul dynamique des initiales
+   * Gère les noms composés ou simples (ex: "Demba Ba" -> "DB")
+   */
   get initiales(): string {
-    if (!this.currentUser?.nom) return '??';
-    const parts = this.currentUser.nom.trim().split(' ');
+    if (!this.currentUser?.nom) return 'U';
+    const parts = this.currentUser.nom.trim().split(/\s+/);
     if (parts.length > 1) {
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
     return parts[0].substring(0, 2).toUpperCase();
   }
 
-  // --- RECHERCHE & DÉCONNEXION ---
-
   onSearch(): void {
     const query = this.searchQuery.trim().toLowerCase();
     if (!query) return;
 
-    const routes: { [key: string]: string } = { 'cat:': '/categories', 'fou:': '/fournisseurs' };
-    const prefix = Object.keys(routes).find(p => query.startsWith(p));
-
-    if (prefix) {
-      this.router.navigate([routes[prefix]], { queryParams: { q: query.replace(prefix, '').trim() } });
+    if (query.startsWith('cat:')) {
+      this.router.navigate(['/categories'], { queryParams: { q: query.replace('cat:', '').trim() } });
+    } else if (query.startsWith('fou:')) {
+      this.router.navigate(['/fournisseurs'], { queryParams: { q: query.replace('fou:', '').trim() } });
     } else {
       this.router.navigate(['/produits'], { queryParams: { q: query } });
     }
-    this.searchQuery = '';
-  }
 
-  deconnexion(): void {
-    if (confirm("Souhaitez-vous fermer votre session sécurisée ?")) {
-      this.utilisateurService.clearUser(); // On vide le flux
-      localStorage.removeItem('token'); // Si tu as un token
-      this.router.navigate(['/login']);
-    }
+    this.searchQuery = '';
+    this.notifMenuOpen = false;
+    this.profileMenuOpen = false;
   }
 }

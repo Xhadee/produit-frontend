@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap, map } from 'rxjs';
+import { Observable, BehaviorSubject, tap, map, of } from 'rxjs';
 
 export interface Utilisateur {
   id?: number;
@@ -19,26 +19,52 @@ export class UtilisateurService {
   private readonly API_URL = 'http://localhost:8080/api/utilisateurs';
   private readonly AUTH_URL = 'http://localhost:8080/api/auth';
 
-  private userSubject = new BehaviorSubject<Utilisateur | null>(null);
+  // --- Sujets de données ---
+  private userSubject = new BehaviorSubject<Utilisateur | null>(this.getInitialUser());
   user$ = this.userSubject.asObservable();
 
-  constructor() {
+  // État de transition pour le Welcome Screen
+  private isWelcomingSubject = new BehaviorSubject<boolean>(false);
+  isWelcoming$ = this.isWelcomingSubject.asObservable();
+
+  constructor() {}
+
+  /**
+   * Vérification initiale du stockage local
+   */
+  private getInitialUser(): Utilisateur | null {
     const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
+    const token = localStorage.getItem('token');
+    if (savedUser && token) {
       try {
-        this.userSubject.next(JSON.parse(savedUser));
+        return JSON.parse(savedUser);
       } catch (e) {
-        localStorage.removeItem('currentUser');
+        this.logout();
+        return null;
       }
     }
+    return null;
+  }
+
+  /**
+   * Pilote l'affichage du Welcome Screen depuis les composants
+   */
+  setWelcoming(value: boolean): void {
+    this.isWelcomingSubject.next(value);
   }
 
   /**
    * AUTH : Connexion
    */
-  login(username: string, password: string): Observable<Utilisateur> {
-    return this.http.post<Utilisateur>(`${this.AUTH_URL}/login`, { username, password }).pipe(
-      tap(user => this.setSession(user))
+  login(username: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.AUTH_URL}/login`, { username, password }).pipe(
+      tap(res => {
+        const token = res.token || res.accessToken;
+        if (token) localStorage.setItem('token', token);
+
+        const user = res.user || res;
+        this.setSession(user);
+      })
     );
   }
 
@@ -50,16 +76,17 @@ export class UtilisateurService {
   }
 
   /**
-   * GUARD : Vérifie si l'utilisateur est connecté
+   * GUARD : Vérification de session
    */
   isLoggedIn(): Observable<boolean> {
-    return this.user$.pipe(
-      map(user => !!user)
-    );
+    const hasToken = !!localStorage.getItem('token');
+    const hasUser = !!localStorage.getItem('currentUser');
+    if (hasToken && hasUser) return of(true);
+    return this.user$.pipe(map(user => !!user && hasToken));
   }
 
   /**
-   * PROFIL : Récupère les infos actuelles
+   * PROFIL : Données de l'utilisateur courant
    */
   getMe(): Observable<Utilisateur> {
     return this.http.get<Utilisateur>(`${this.API_URL}/me`).pipe(
@@ -75,34 +102,30 @@ export class UtilisateurService {
       tap(() => {
         const currentUser = this.userSubject.value;
         if (currentUser) {
-          const updated = { ...currentUser, ...user };
-          // On ne stocke pas le password en local s'il est présent
-          delete updated.password;
-          this.setSession(updated);
+          this.setSession({ ...currentUser, ...user });
         }
       })
     );
   }
 
   /**
-   * SESSION : Nettoie les données (utilisé par Navbar)
-   */
-  clearUser(): void {
-    localStorage.removeItem('currentUser');
-    this.userSubject.next(null);
-  }
-
-  /**
-   * Alias de déconnexion
+   * LOGOUT : Nettoyage global
    */
   logout(): void {
-    this.clearUser();
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
+    this.userSubject.next(null);
+    this.setWelcoming(false); // Sécurité : on cache le welcome screen si on déconnecte
+  }
+
+  clearUser(): void {
+    this.logout();
   }
 
   /**
-   * Centralisation de la mise à jour du stockage
+   * Centralisation du stockage
    */
-  private setSession(user: Utilisateur) {
+  private setSession(user: Utilisateur): void {
     localStorage.setItem('currentUser', JSON.stringify(user));
     this.userSubject.next(user);
   }

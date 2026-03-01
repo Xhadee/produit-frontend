@@ -12,8 +12,9 @@ import { UtilisateurService } from '../../services/utilisateur.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  // Propriétés d'état
   isLoginMode = true;
-  isLoading = false;
+  isLoading = false; // Spinner du bouton
   errorMessage = '';
 
   credentials = {
@@ -23,6 +24,7 @@ export class LoginComponent {
     email: ''
   };
 
+  // Injections
   private router = inject(Router);
   private userService = inject(UtilisateurService);
 
@@ -33,8 +35,13 @@ export class LoginComponent {
   }
 
   onSubmit() {
+    // LOG DE DÉPART : Si tu ne vois pas ça, le bouton HTML ne déclenche rien
+    console.log('--- Tentative de soumission ---');
+    console.log('Mode:', this.isLoginMode ? 'Login' : 'Register');
+
     if (!this.credentials.username || !this.credentials.password) {
       this.errorMessage = "Veuillez remplir tous les champs obligatoires.";
+      console.warn('Formulaire incomplet');
       return;
     }
 
@@ -42,31 +49,53 @@ export class LoginComponent {
     this.errorMessage = '';
 
     if (this.isLoginMode) {
-      // --- CONNEXION ---
       this.userService.login(this.credentials.username, this.credentials.password).subscribe({
-        next: (user) => {
-          console.log('Succès:', user.username);
-          // Redirection vers produits (car c'est ta route par défaut dans app.routes)
-          this.router.navigate(['/produits']);
+        next: (res) => {
+          // 1. On lance l'écran de bienvenue immédiatement
+          this.userService.setWelcoming(true);
+          this.isLoading = false;
+
+          // 2. PETITE ASTUCE : On attend 100ms
+          // Cela laisse le temps au service de finir d'écrire dans le localStorage
+          // et au Guard de voir que l'utilisateur est bien connecté.
+          setTimeout(() => {
+            this.router.navigate(['/dashboard']).then((navigated) => {
+              console.log('Navigation vers dashboard réussie ?', navigated);
+
+              if (navigated) {
+                // 3. On attend les 2 secondes de l'animation avant de retirer le rideau
+                setTimeout(() => {
+                  this.userService.setWelcoming(false);
+                }, 2000);
+              } else {
+                // Sécurité : Si le Guard bloque encore, on ne reste pas coincé sur le Welcome Screen
+                this.userService.setWelcoming(false);
+                this.errorMessage = "Erreur de redirection. Veuillez réessayer.";
+              }
+            });
+          }, 100);
         },
         error: (err) => {
           this.isLoading = false;
-          // On récupère le message JSON du backend s'il existe
-          this.errorMessage = err.error?.error || "Identifiants incorrects ou serveur indisponible.";
-          console.error('Login error:', err);
+          this.errorMessage = err.error?.message || "Identifiants incorrects.";
         }
       });
     } else {
-      // --- INSCRIPTION ---
+      // --- PHASE D'INSCRIPTION ---
+      console.log('Appel service register...');
+
       this.userService.register(this.credentials).subscribe({
         next: () => {
+          console.log('Inscription réussie');
           this.isLoading = false;
           this.isLoginMode = true;
-          this.errorMessage = "Compte créé ! Connectez-vous maintenant.";
+          this.errorMessage = "Compte créé avec succès ! Connectez-vous.";
+          this.credentials.password = '';
         },
         error: (err) => {
           this.isLoading = false;
-          this.errorMessage = err.error?.error || "Erreur lors de l'inscription.";
+          console.error('Erreur API Register:', err);
+          this.errorMessage = err.error?.message || "Erreur lors de l'inscription.";
         }
       });
     }

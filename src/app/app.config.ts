@@ -2,13 +2,16 @@ import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
-import { authInterceptor } from './interceptors/auth.interceptor'; // Import ici
+import { authInterceptor } from './interceptors/auth.interceptor';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts'; // <--- Import des charts
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([authInterceptor]) // Activation ici
-    )
+      withInterceptors([authInterceptor])
+    ),
+    // Configuration globale pour Chart.js
+    provideCharts(withDefaultRegisterables()) // <--- Enregistrement ici
   ]
 };

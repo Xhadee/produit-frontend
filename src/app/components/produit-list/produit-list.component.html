@@ -33,7 +33,7 @@
         </div>
         <div class="text-start">
           <div class="fw-bold small text-uppercase text-truncate" style="max-width: 100px;">{{ catNom }}</div>
-          <div class="cat-count">{{ produitsParCategorie[catNom]?.length || 0 }} articles</div>
+          <div class="cat-count">{{ produitsParCategorie[catNom].length || 0 }} articles</div>
         </div>
       </div>
     </div>
@@ -106,70 +106,6 @@
 </div>
 
 <div class="modal fade" id="produitModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content modal-neo border-0 shadow-lg">
-      <div class="modal-header border-0 p-4 pb-0">
-        <h5 class="modal-title fw-black title-theme">
-          {{ isEditMode ? 'Modifier le Produit' : 'Nouveau Produit' }}
-        </h5>
-        <button type="button" class="btn-close shadow-none" id="closeModalBtn" data-bs-dismiss="modal"></button>
-      </div>
-
-      <form [formGroup]="produitForm" (ngSubmit)="onSubmit()">
-        <div class="modal-body p-4">
-          <div class="row g-3">
-            <div class="col-12">
-              <label class="form-label text-muted small fw-bold">IMAGE DU PRODUIT (URL)</label>
-              <input type="text" formControlName="imageUrl" class="form-control custom-input" placeholder="https://votre-image.jpg">
-            </div>
-
-            <div class="col-12">
-              <label class="form-label text-muted small fw-bold">DÉSIGNATION</label>
-              <input type="text" formControlName="designation" class="form-control custom-input" placeholder="Nom du produit">
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label text-muted small fw-bold">PRIX UNITAIRE</label>
-              <input type="number" formControlName="prixUnitaire" class="form-control custom-input">
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-muted small fw-bold">STOCK INITIAL</label>
-              <input type="number" formControlName="quantiteStock" class="form-control custom-input">
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label text-muted small fw-bold">SEUIL D'ALERTE</label>
-              <input type="number" formControlName="seuilAlerte" class="form-control custom-input">
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label text-muted small fw-bold">CATÉGORIE</label>
-              <select formControlName="categorie" class="form-select custom-input" [compareWith]="compareObjects">
-                <option [ngValue]="null">Choisir une catégorie...</option>
-                <option *ngFor="let c of categories" [ngValue]="c">{{ c.nom }}</option>
-              </select>
-            </div>
-
-            <div class="col-12">
-              <label class="form-label text-muted small fw-bold">FOURNISSEUR</label>
-              <select formControlName="fournisseur" class="form-select custom-input" [compareWith]="compareObjects">
-                <option [ngValue]="null">Choisir un fournisseur...</option>
-                <option *ngFor="let f of fournisseurs" [ngValue]="f">{{ f.nom }}</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer border-0 p-4 pt-0">
-          <button type="button" class="btn btn-light rounded-4 px-4 fw-bold" data-bs-dismiss="modal">Annuler</button>
-          <button type="submit" class="btn btn-primary-gradient rounded-4 px-5 fw-bold" [disabled]="produitForm.invalid">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ isEditMode ? 'Enregistrer les modifications' : 'Créer le produit' }}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 </div>
 
 <ng-template #loader>
