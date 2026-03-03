@@ -66,3 +66,25 @@ src/app/
 ├── interceptors/  # Interception HTTP (Injection auto du Token JWT)
 ├── models/        # Typages et interfaces de données (TypeScript)
 └── services/      # Logique métier et appels API (RxJS)
+```
+---
+
+## 🔗 Écosystème IPSLStock
+
+🎨 **Backend Spring :**  
+👉 [IPSLStock Frontend](https://github.com/Xhadee/produit_backend)
+
+---
+
+## 👤 Auteur
+
+<strong>Développeur :</strong> Khady NDIAYE  
+<strong>Formation :</strong> IPSL (Institut Polytechnique de Saint-Louis)  
+<strong>Promotion :</strong> 2025-2026  
+
+---
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Projet-Ing%C3%A9nieur-orange?style=flat-square" />
+  <img src="https://img.shields.io/badge/Backend-Operational-success?style=flat-square" />
+</p>
