@@ -72,7 +72,7 @@ src/app/
 ## 🔗 Écosystème IPSLStock
 
 🎨 **Backend Spring :**  
-👉 [IPSLStock Frontend](https://github.com/Xhadee/produit_backend)
+👉 [IPSLStock Backend](https://github.com/Xhadee/produit_backend)
 
 ---
 
