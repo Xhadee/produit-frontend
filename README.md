@@ -39,20 +39,20 @@
 * **Angular CLI** installé globalement (`npm install -g @angular/cli`)
 
 ### Déploiement local
-1.  **Récupérer le code** :
+1. **Récupérer le code** :
     ```bash
     git clone [https://github.com/Xhadee/produit-frontend.git](https://github.com/Xhadee/produit-frontend.git)
     cd produit-frontend
     ```
-2.  **Installer les dépendances** :
+2. **Installer les dépendances** :
     ```bash
     npm install
     ```
-3.  **Lancer le moteur** :
+3. **Lancer le moteur** :
     ```bash
     ng serve
     ```
-    👉 Naviguez vers `http://localhost:4200/`
+   👉 Naviguez vers `http://localhost:4200/`
 
 ---
 
@@ -66,24 +66,3 @@ src/app/
 ├── interceptors/  # Interception HTTP (Injection auto du Token JWT)
 ├── models/        # Typages et interfaces de données (TypeScript)
 └── services/      # Logique métier et appels API (RxJS)
-
----
-
-## 🔗 Écosystème IPSLStock
-Ce frontend est conçu pour fonctionner en symbiose avec son API dédiée. Elle assure la persistance des données, la logique métier de l'inventaire et les calculs prédictifs.
-
-* **Repository Backend** : [🚀 Accéder au Backend Spring Boot](https://github.com/Xhadee/produit-backend.git)
-
----
-
-## 👤 Auteur
-<p align="left">
-  <strong>Développeur :</strong> [Khady NDIAYE]<br>
-  <strong>Formation :</strong> IPSL (Institut Polytechnique de Saint-Louis)<br>
-  <strong>Promotion :</strong> 2025-2026
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Projet-Académique-blue?style=flat-square" />
-  <img src="https://img.shields.io/badge/Status-Completed-success?style=flat-square" />
-</p>
