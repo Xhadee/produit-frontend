@@ -2,8 +2,8 @@
 
   <div class="header-glass p-4 mb-5 rounded-5 shadow-soft d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
     <div class="text-center text-md-start">
-      <h2 class="title-theme fw-black mb-1">Produits</h2>
-      <p class="text-secondary-adaptive mb-0">Organisez vos produits par familles de catégories</p>
+      <h2 class="title-theme fw-black mb-1">📦 Produits</h2>
+      <p class="text-secondary-adaptive mb-0">Organisez vos produits par familles de categories</p>
     </div>
 
     <div class="d-flex flex-grow-1 justify-content-center px-md-5">
@@ -11,7 +11,7 @@
         <i class="bi bi-search search-icon"></i>
         <input type="text" class="form-control search-input shadow-none"
                [(ngModel)]="searchTerm" (input)="grouperEtFiltrer()"
-               placeholder="Rechercher un produit...">
+               placeholder="Rechercher un produit ou une catégorie...">
       </div>
     </div>
 
@@ -29,11 +29,11 @@
          class="category-pill shadow-sm transition-all cursor-pointer">
       <div class="d-flex align-items-center gap-3">
         <div class="cat-icon-box">
-          <i class="bi bi-grid-1x2"></i>
+          <i class="bi bi-tag-fill"></i>
         </div>
         <div class="text-start">
           <div class="fw-bold small text-uppercase text-truncate" style="max-width: 100px;">{{ catNom }}</div>
-          <div class="cat-count">{{ produitsParCategorie[catNom].length || 0 }} articles</div>
+          <div class="cat-count text-primary">{{ produitsParCategorie[catNom].length || 0 }} articles</div>
         </div>
       </div>
     </div>
@@ -42,13 +42,14 @@
   <div class="row g-4 mb-5" *ngIf="categorieSelectionnee">
     <div class="col-xl-3 col-lg-4 col-md-6" *ngFor="let p of produitsPagines">
       <div class="card h-100 product-card border-0 shadow-soft overflow-hidden">
+
         <div class="position-relative product-img-container" (click)="voirDetails(p.id!)">
           <img [src]="p.imageUrl || 'https://placehold.co/400x400/2563eb/ffffff?text=' + p.designation"
                class="w-100 h-100 object-fit-cover transition-all" alt="produit">
           <div class="position-absolute top-0 end-0 p-2">
             <span class="badge-status shadow-sm"
                   [ngClass]="(p.quantiteStock || 0) <= (p.seuilAlerte || 0) ? 'status-alert' : 'status-ok'">
-              {{ (p.quantiteStock || 0) <= (p.seuilAlerte || 0) ? 'Alerte' : 'En stock' }}
+              {{ (p.quantiteStock || 0) <= (p.seuilAlerte || 0) ? '🔴 Alerte' : '🟢 En stock' }}
             </span>
           </div>
         </div>
@@ -71,13 +72,13 @@
             </div>
             <div class="progress-modern">
               <div class="progress-bar-modern"
-                   [style.width.%]="(p.quantiteStock! / (p.seuilAlerte! * 4)) * 100 > 100 ? 100 : (p.quantiteStock! / (p.seuilAlerte! * 4)) * 100"
-                   [ngClass]="(p.quantiteStock || 0) <= (p.seuilAlerte || 0) ? 'bg-danger' : 'bg-primary'"></div>
+                   [style.width.%]="(p.quantiteStock! / (p.seuilAlerte! * 2.5)) * 100 > 100 ? 100 : (p.quantiteStock! / (p.seuilAlerte! * 2.5)) * 100"
+                   [ngClass]="(p.quantiteStock || 0) <= (p.seuilAlerte || 0) ? 'bg-danger' : 'bg-success'"></div>
             </div>
           </div>
 
-          <div class="d-flex gap-2 action-row mt-4">
-            <button class="btn-action-circle" (click)="voirDetails(p.id!)" title="Voir">
+          <div class="d-flex gap-2 action-row mt-4 justify-content-center">
+            <button class="btn-action-circle" (click)="voirDetails(p.id!)" title="Détails">
               <i class="bi bi-eye"></i>
             </button>
             <button class="btn-action-circle" data-bs-toggle="modal" data-bs-target="#produitModal" (click)="preparerEdition(p)" title="Modifier">
@@ -105,12 +106,80 @@
   </div>
 </div>
 
-<div class="modal fade" id="produitModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="produitModal" tabindex="-1" aria-labelledby="produitModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+
+      <div class="modal-header border-0 p-4 pb-0">
+        <h5 class="modal-title fw-black title-theme" id="produitModalLabel">
+          {{ isEditMode ? '📝 Modifier le produit' : '✨ Nouveau Produit' }}
+        </h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" id="closeModalBtn"></button>
+      </div>
+
+      <form [formGroup]="produitForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body p-4">
+          <div class="row g-4">
+
+            <div class="col-12">
+              <label class="form-label small fw-bold text-muted">Désignation du produit</label>
+              <input type="text" formControlName="designation" class="form-control form-control-lg rounded-3 border-light bg-light">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-muted">Prix Unitaire (FCFA)</label>
+              <input type="number" formControlName="prixUnitaire" class="form-control rounded-3">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-muted">Quantité initiale en stock</label>
+              <input type="number" formControlName="quantiteStock" class="form-control rounded-3">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-muted">Famille de catégorie</label>
+              <select formControlName="categorie" [compareWith]="compareObjects" class="form-select rounded-3">
+                <option [ngValue]="null">Choisir une catégorie...</option>
+                <option *ngFor="let cat of categories" [ngValue]="cat">{{ cat.nom }}</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-muted">Fournisseur</label>
+              <select formControlName="fournisseur" [compareWith]="compareObjects" class="form-select rounded-3">
+                <option [ngValue]="null">Choisir un fournisseur...</option>
+                <option *ngFor="let fou of fournisseurs" [ngValue]="fou">{{ fou.nom }}</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-muted">Seuil critique d'alerte</label>
+              <input type="number" formControlName="seuilAlerte" class="form-control rounded-3 border-warning">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-muted">Lien de l'image (Optionnel)</label>
+              <input type="text" formControlName="imageUrl" class="form-control rounded-3">
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modal-footer border-0 p-4">
+          <button type="button" class="btn btn-light px-4 rounded-3 fw-bold" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary-gradient px-5 rounded-3 fw-bold shadow-sm"
+                  [disabled]="produitForm.invalid">
+            {{ isEditMode ? 'Mettre à jour' : 'Enregistrer le produit' }}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
 </div>
 
 <ng-template #loader>
   <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 80vh;">
     <div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
-    <p class="text-muted fw-bold mt-4 animate-pulse">Synchronisation de l'inventaire...</p>
+    <p class="text-muted fw-bold mt-4 animate-pulse">Chargement de votre inventaire IPSL...</p>
   </div>
 </ng-template>

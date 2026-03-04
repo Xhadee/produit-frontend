@@ -89,7 +89,7 @@
               </div>
               <div class="text-end">
                 <span class="badge rounded-pill px-3 py-2"
-                      [ngClass]="(p.quantiteStock ?? 0) === 0 ? 'bg-danger' : 'bg-warning text-dark'">
+                      [ngClass]="p.quantiteStock === 0 ? 'bg-danger' : 'bg-warning text-dark'">
                   {{ p.quantiteStock }} en stock
                 </span>
               </div>
