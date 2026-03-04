@@ -41,13 +41,6 @@
           </div>
 
           <div class="notif-list-container custom-scrollbar">
-            <div *ngIf="notifications.length === 0" class="p-5 text-center">
-              <div class="empty-notif-icon mb-3">
-                <i class="bi bi-shield-check fs-1 text-success opacity-50"></i>
-              </div>
-              <p class="small text-muted mb-0">Tout est sous contrôle !</p>
-            </div>
-
             <div *ngFor="let n of notifications"
                  class="notif-item p-3 border-bottom d-flex gap-3 align-items-start transition-all"
                  [class.unread-bg]="!n.lu">
@@ -59,25 +52,17 @@
               <div class="flex-grow-1 overflow-hidden">
                 <div class="d-flex justify-content-between align-items-center mb-1">
                   <span class="notif-title fw-bold text-dark small text-truncate">{{ n.titre }}</span>
-                  <button (click)="marquerLue(n.id, $event)" class="btn-mark-read border-0 bg-transparent p-0 text-muted" title="Marquer comme lu">
+                  <button (click)="marquerLue(n.id!, $event)" class="btn-mark-read border-0 bg-transparent p-0 text-muted">
                     <i class="bi bi-check2"></i>
                   </button>
                 </div>
                 <p class="notif-msg mb-1 text-muted small lh-sm">{{ n.message }}</p>
-                <div class="d-flex align-items-center gap-2">
-                  <i class="bi bi-clock-history smaller text-muted"></i>
-                  <small class="notif-date text-muted smaller">{{ n.dateCreation | date:'HH:mm' }}</small>
-                </div>
               </div>
             </div>
-          </div>
 
-          <div class="p-2 text-center border-top bg-light-soft">
-            <a class="btn btn-sm btn-link text-decoration-none text-primary w-100 fw-bold py-2"
-               routerLink="/notifications"
-               (click)="notifMenuOpen = false">
-              <i class="bi bi-eye me-2"></i>Voir tout l'historique
-            </a>
+            <div *ngIf="notifications.length === 0" class="p-4 text-center text-muted small">
+              Aucune notification
+            </div>
           </div>
         </div>
       </div>
@@ -98,6 +83,30 @@
           </div>
           <i class="bi bi-chevron-down nav-chevron text-muted d-none d-md-block" [class.rotated]="profileMenuOpen"></i>
         </button>
+
+        <div class="nav-dropdown profile-dropdown shadow-lg animate__animated animate__fadeIn border-0"
+             *ngIf="profileMenuOpen"
+             style="right: 0; left: auto; min-width: 200px;">
+          <div class="p-3 border-bottom bg-light rounded-top">
+            <div class="fw-bold text-dark small">{{ currentUser.nom }}</div>
+            <div class="text-muted smaller">{{ currentUser.email }}</div>
+          </div>
+
+          <div class="list-group list-group-flush p-2">
+            <a routerLink="/profile" class="list-group-item list-group-item-action border-0 rounded small" (click)="profileMenuOpen = false">
+              <i class="bi bi-person me-2"></i> Mon Profil
+            </a>
+            <a routerLink="/parametres" class="list-group-item list-group-item-action border-0 rounded small" (click)="profileMenuOpen = false">
+              <i class="bi bi-gear me-2"></i> Paramètres
+            </a>
+
+            <div class="border-top my-2"></div>
+
+            <button (click)="deconnexion()" class="list-group-item list-group-item-action border-0 rounded small text-danger fw-bold">
+              <i class="bi bi-box-arrow-right me-2"></i> Déconnexion
+            </button>
+          </div>
+        </div>
       </div>
 
     </div>
